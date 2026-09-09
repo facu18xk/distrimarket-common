@@ -61,6 +61,32 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <!-- 2. OpenAPI Generator: Genera SOLO DTOs a partir de openapi.yaml -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.4.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <!-- Paquete donde se generarán los DTOs -->
+                            <modelPackage>com.distrimarket.commons.dto</modelPackage>
+                            <generateApis>false</generateApis>              <!-- No generar controllers todavía -->
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>false</interfaceOnly>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
