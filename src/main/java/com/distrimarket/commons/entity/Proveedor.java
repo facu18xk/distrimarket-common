@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Proveedor extends BaseEntity{
+public class Proveedor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,6 @@ public class Proveedor extends BaseEntity{
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
     private Persona persona;
-
-    @Column(name = "razon_social", nullable = false, length = 150)
-    private String razonSocial;
 
     @Column(name = "nombre_fantasia", length = 150)
     private String nombreFantasia;
