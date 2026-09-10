@@ -2,8 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "detalles")
-public class FacturaVenta {
+public class FacturaVenta extends Comprobante {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,31 +28,10 @@ public class FacturaVenta {
     @JoinColumn(name = "id_empleado", nullable = false)
     private Empleado empleado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_deposito", nullable = false)
-    private Deposito deposito;
-
+    // Relación al Timbrado propio de la empresa
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_timbrado", nullable = false)
     private Timbrado timbrado;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_medio_pago", nullable = false)
-    private MedioPago medioPago;
-
-    @Column(name = "numero_factura", nullable = false, unique = true, length = 30)
-    private String numeroFactura;
-
-    @Column(name = "fecha_emision")
-    private LocalDateTime fechaEmision;
-
-    @Column(name = "total_iva", nullable = false)
-    @Builder.Default
-    private BigDecimal totalIva = BigDecimal.ZERO;
-
-    @Column(name = "total_general", nullable = false)
-    @Builder.Default
-    private BigDecimal totalGeneral = BigDecimal.ZERO;
 
     @Column(nullable = false, length = 20)
     @Builder.Default
@@ -64,15 +41,20 @@ public class FacturaVenta {
     @Builder.Default
     private List<FacturaVentaDetalle> detalles = new ArrayList<>();
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.fechaEmision == null) {
-            this.fechaEmision = LocalDateTime.now();
-        }
-    }
-
+    // Manejo bidireccional y recálculo automático
     public void agregarDetalle(FacturaVentaDetalle detalle) {
         detalles.add(detalle);
         detalle.setFacturaVenta(this);
+        recalcularTotales();
+    }
+
+    public void recalcularTotales() {
+        this.setTotalGeneral(detalles.stream()
+                .map(d -> { d.calcularSubtotal(); return d.getSubtotal(); })
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
+
+        this.setTotalIva(detalles.stream()
+                .map(ComprobanteDetalle::getMontoIva)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
     }
 }
