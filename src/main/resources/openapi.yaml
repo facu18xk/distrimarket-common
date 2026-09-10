@@ -1,0 +1,633 @@
+openapi: 3.0.3
+info:
+  title: DistriMarket API - Módulo Inventarios
+  description: Contrato API y DTOs para Productos, Marcas, Categorías, Depósitos y Ajustes de Stock (Cabecera-Detalle).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Servidor Local de Desarrollo
+
+paths:
+  /productos:
+    get:
+      summary: Listar productos con paginación y filtros
+      tags:
+        - Productos
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: nombre
+          in: query
+          schema:
+            type: string
+        - name: idCategoria
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista paginada de productos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoPageResponseDTO'
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoRequestDTO'
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoResponseDTO'
+
+  /inventario/ajustes:
+    get:
+      summary: Listar ajustes de stock
+      tags:
+        - Ajuste de Stock
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: idDeposito
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista paginada de ajustes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AjusteStockPageResponseDTO'
+    post:
+      summary: Crear un ajuste de stock (Formulario Cabecera-Detalle)
+      tags:
+        - Ajuste de Stock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AjusteStockRequestDTO'
+      responses:
+        '201':
+          description: Ajuste procesado e inventario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AjusteStockResponseDTO'
+
+  /inventario/transferencias:
+    get:
+      summary: Listar transferencias de stock entre depósitos
+      tags:
+        - Transferencia de Stock
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: idDepositoOrigen
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: idDepositoDestino
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista paginada de transferencias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaStockPageResponseDTO'
+    post:
+      summary: Registrar una transferencia entre depósitos (Cabecera-Detalle)
+      tags:
+        - Transferencia de Stock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferenciaStockRequestDTO'
+      responses:
+        '201':
+          description: Transferencia procesada y stocks actualizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+
+components:
+  schemas:
+    # -------------------------------------------------------------
+    # CATEGORÍAS & MARCAS DTOs
+    # -------------------------------------------------------------
+    CategoriaDTO:
+      type: object
+      required:
+        - nombre
+      properties:
+        idCategoria:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        nombre:
+          type: string
+          maxLength: 80
+          example: Lácteos
+        descripcion:
+          type: string
+          maxLength: 200
+          example: Productos lácteos y derivados
+
+    MarcaDTO:
+      type: object
+      required:
+        - nombre
+      properties:
+        idMarca:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        nombre:
+          type: string
+          maxLength: 80
+          example: Trébol
+
+    # -------------------------------------------------------------
+    # PRODUCTO DTOs
+    # -------------------------------------------------------------
+    ProductoRequestDTO:
+      type: object
+      required:
+        - idCategoria
+        - idMarca
+        - nombre
+        - precioCosto
+        - precioVenta
+        - porcentajeIva
+        - stockMinimo
+      properties:
+        idCategoria:
+          type: integer
+          format: int64
+          example: 1
+        idMarca:
+          type: integer
+          format: int64
+          example: 1
+        codigoBarra:
+          type: string
+          maxLength: 60
+          example: "7840001234567"
+        nombre:
+          type: string
+          maxLength: 120
+          example: Leche Entera 1L
+        descripcion:
+          type: string
+          example: Leche ultra pasteurizada cartón 1 litro
+        precioCosto:
+          type: number
+          format: double
+          minimum: 0
+          example: 4500.00
+        precioVenta:
+          type: number
+          format: double
+          minimum: 0
+          example: 6000.00
+        porcentajeIva:
+          type: number
+          format: double
+          example: 10.00
+        stockMinimo:
+          type: integer
+          minimum: 0
+          example: 10
+        estado:
+          type: boolean
+          default: true
+
+    ProductoResponseDTO:
+      type: object
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        categoria:
+          $ref: '#/components/schemas/CategoriaDTO'
+        marca:
+          $ref: '#/components/schemas/MarcaDTO'
+        codigoBarra:
+          type: string
+          example: "7840001234567"
+        nombre:
+          type: string
+          example: Leche Entera 1L
+        descripcion:
+          type: string
+          example: Leche ultra pasteurizada cartón 1 litro
+        precioCosto:
+          type: number
+          format: double
+          example: 4500.00
+        precioVenta:
+          type: number
+          format: double
+          example: 6000.00
+        porcentajeIva:
+          type: number
+          format: double
+          example: 10.00
+        stockMinimo:
+          type: integer
+          example: 10
+        estado:
+          type: boolean
+          example: true
+
+    # -------------------------------------------------------------
+    # DEPÓSITO & STOCK DTOs
+    # -------------------------------------------------------------
+    DepositoDTO:
+      type: object
+      required:
+        - nombre
+      properties:
+        idDeposito:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        nombre:
+          type: string
+          maxLength: 80
+          example: Depósito Central
+        ubicacion:
+          type: string
+          maxLength: 150
+          example: Av. Mariscal López 1234
+        estado:
+          type: boolean
+          default: true
+
+    StockDepositoResponseDTO:
+      type: object
+      properties:
+        idStock:
+          type: integer
+          format: int64
+          example: 1
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        nombreDeposito:
+          type: string
+          example: Depósito Central
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        nombreProducto:
+          type: string
+          example: Leche Entera 1L
+        cantidad:
+          type: integer
+          example: 150
+
+    # -------------------------------------------------------------
+    # CABECERA-DETALLE: AJUSTE DE STOCK DTOs
+    # -------------------------------------------------------------
+    AjusteStockDetalleRequestDTO:
+      type: object
+      required:
+        - idProducto
+        - cantidad
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 5
+
+    AjusteStockRequestDTO:
+      type: object
+      required:
+        - idDeposito
+        - idEmpleado
+        - motivo
+        - tipoAjuste
+        - detalles
+      properties:
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 2
+        motivo:
+          type: string
+          maxLength: 200
+          example: Rotura de empaque en depósito
+        tipoAjuste:
+          type: string
+          enum: [POSITIVO, NEGATIVO]
+          example: NEGATIVO
+        detalles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AjusteStockDetalleRequestDTO'
+
+    AjusteStockDetalleResponseDTO:
+      type: object
+      properties:
+        idAjusteDetalle:
+          type: integer
+          format: int64
+          example: 501
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        nombreProducto:
+          type: string
+          example: Leche Entera 1L
+        codigoBarra:
+          type: string
+          example: "7840001234567"
+        cantidad:
+          type: integer
+          example: 5
+
+    AjusteStockResponseDTO:
+      type: object
+      properties:
+        idAjuste:
+          type: integer
+          format: int64
+          example: 12
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        nombreDeposito:
+          type: string
+          example: Depósito Central
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 2
+        nombreEmpleado:
+          type: string
+          example: Juan Pérez
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-09-10T11:08:24"
+        motivo:
+          type: string
+          example: Rotura de empaque en depósito
+        tipoAjuste:
+          type: string
+          enum: [POSITIVO, NEGATIVO]
+          example: NEGATIVO
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AjusteStockDetalleResponseDTO'
+
+    # -------------------------------------------------------------
+    # TRANSFERENCIAS STOCK
+    # -------------------------------------------------------------
+    TransferenciaStockDetalleRequestDTO:
+      type: object
+      required:
+        - idProducto
+        - cantidad
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 10
+
+    TransferenciaStockRequestDTO:
+      type: object
+      required:
+        - idDepositoOrigen
+        - idDepositoDestino
+        - idEmpleado
+        - detalles
+      properties:
+        idDepositoOrigen:
+          type: integer
+          format: int64
+          example: 1
+        idDepositoDestino:
+          type: integer
+          format: int64
+          example: 2
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        observacion:
+          type: string
+          maxLength: 255
+          example: Reabastecimiento de sucursal centro
+        detalles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TransferenciaStockDetalleRequestDTO'
+
+    TransferenciaStockDetalleResponseDTO:
+      type: object
+      properties:
+        idTransferenciaDetalle:
+          type: integer
+          format: int64
+          example: 801
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        nombreProducto:
+          type: string
+          example: Leche Entera 1L
+        codigoBarra:
+          type: string
+          example: "7840001234567"
+        cantidad:
+          type: integer
+          example: 10
+
+    TransferenciaStockResponseDTO:
+      type: object
+      properties:
+        idTransferencia:
+          type: integer
+          format: int64
+          example: 15
+        idDepositoOrigen:
+          type: integer
+          format: int64
+          example: 1
+        nombreDepositoOrigen:
+          type: string
+          example: Depósito Central
+        idDepositoDestino:
+          type: integer
+          format: int64
+          example: 2
+        nombreDepositoDestino:
+          type: string
+          example: Depósito Sucursal 1
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        nombreEmpleado:
+          type: string
+          example: María Gómez
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-09-10T11:35:00"
+        observacion:
+          type: string
+          example: Reabastecimiento de sucursal centro
+        estado:
+          type: string
+          example: COMPLETADO
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferenciaStockDetalleResponseDTO'
+
+    TransferenciaStockPageResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 8
+        totalPages:
+          type: integer
+          example: 1
+        isLast:
+          type: boolean
+          example: true
+
+    # -------------------------------------------------------------
+    # RESPUESTAS PAGINADAS (GENÉRICAS PARA SWAGGER)
+    # -------------------------------------------------------------
+    ProductoPageResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductoResponseDTO'
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 45
+        totalPages:
+          type: integer
+          example: 5
+        isLast:
+          type: boolean
+          example: false
+
+    AjusteStockPageResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AjusteStockResponseDTO'
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 12
+        totalPages:
+          type: integer
+          example: 2
+        isLast:
+          type: boolean
+          example: false
