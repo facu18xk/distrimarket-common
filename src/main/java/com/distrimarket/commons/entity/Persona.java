@@ -1,6 +1,6 @@
 package com.distrimarket.commons.entity;
 
-import com.distrimarket.commons.entity.enums.TipoPersona;
+import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
 

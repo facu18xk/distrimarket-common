@@ -36,13 +36,14 @@ public abstract class ComprobanteDetalle {
     }
 
     public BigDecimal getMontoIva() {
-        if (subtotal == null || subtotal.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
-
-        if (porcentajeIva.compareTo(new BigDecimal("10.00")) == 0) {
-            return subtotal.divide(new BigDecimal("11"), 2, RoundingMode.HALF_UP);
-        } else if (porcentajeIva.compareTo(new BigDecimal("5.00")) == 0) {
-            return subtotal.divide(new BigDecimal("21"), 2, RoundingMode.HALF_UP);
+        if (subtotal == null || subtotal.compareTo(BigDecimal.ZERO) == 0 ||
+            porcentajeIva == null || porcentajeIva.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
         }
-        return BigDecimal.ZERO;
+
+        // Fórmula universal de IVA incluido: subtotal * porcentajeIva / (100 + porcentajeIva)
+        // Dinámica y configurable: 10% -> subtotal/11, 5% -> subtotal/21, o cualquier otra tasa
+        BigDecimal divisor = BigDecimal.valueOf(100).add(porcentajeIva);
+        return subtotal.multiply(porcentajeIva).divide(divisor, 2, RoundingMode.HALF_UP);
     }
 }
