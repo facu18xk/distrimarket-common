@@ -13,11 +13,6 @@ import lombok.*;
 @Builder
 public class Persona extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_persona")
-    private Long id;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_persona", nullable = false, length = 20)
     private TipoPersona tipoPersona; // Identifica si es Física o Jurídica

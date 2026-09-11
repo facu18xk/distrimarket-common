@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class AjusteStockDetalle extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_ajuste_detalle")
-    private Long idAjusteDetalle;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ajuste", nullable = false)
     private AjusteStock ajusteStock;

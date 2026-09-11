@@ -15,11 +15,6 @@ import java.time.LocalDateTime;
 @Builder
 public class ContactoMensaje extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_mensaje")
-    private Long id;
-
     @Column(name = "nombre_remitente", nullable = false, length = 100)
     private String nombreRemitente;
 

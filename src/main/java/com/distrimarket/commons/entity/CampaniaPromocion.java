@@ -14,11 +14,6 @@ import java.time.LocalDateTime;
 @Builder
 public class CampaniaPromocion extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_promocion")
-    private Long id;
-
     @Column(nullable = false, length = 120)
     private String titulo;
 

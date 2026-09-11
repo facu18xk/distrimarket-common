@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class Proveedor extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_proveedor")
-    private Long id;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
     private Persona persona;

@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class FacturaCompraDetalle extends ComprobanteDetalle {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_factura_compra_detalle")
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_factura_compra", nullable = false)
     private FacturaCompra facturaCompra;

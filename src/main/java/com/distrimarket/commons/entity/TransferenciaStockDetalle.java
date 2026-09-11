@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class TransferenciaStockDetalle extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transferencia_detalle")
-    private Long idTransferenciaDetalle;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_transferencia", nullable = false)
     private TransferenciaStock transferenciaStock;

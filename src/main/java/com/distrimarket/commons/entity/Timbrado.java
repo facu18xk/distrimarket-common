@@ -13,11 +13,6 @@ import java.time.LocalDate;
 @Builder
 public class Timbrado extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_timbrado")
-    private Long id;
-
     @Column(name = "numero_timbrado", nullable = false, unique = true, length = 20)
     private String numeroTimbrado;
 

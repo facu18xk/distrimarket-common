@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class Deposito extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_deposito")
-    private Long idDeposito;
-
     @Column(name = "nombre", nullable = false, unique = true, length = 80)
     private String nombre;
 

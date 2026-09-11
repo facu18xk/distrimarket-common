@@ -12,11 +12,6 @@ import lombok.*;
 @Builder
 public class Categoria extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_categoria")
-    private Long idCategoria;
-
     @Column(name = "nombre", nullable = false, unique = true, length = 80)
     private String nombre;
 

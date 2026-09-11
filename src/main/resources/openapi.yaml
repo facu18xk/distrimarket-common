@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: DistriMarket API - Módulo Inventarios
-  description: Contrato API y DTOs para Productos, Marcas, Categorías, Depósitos y Ajustes de Stock (Cabecera-Detalle).
+  description: Contrato API y DTOs optimizados para Productos, Marcas, Categorías, Depósitos y Ajustes de Stock.
   version: 1.0.0
 servers:
   - url: http://localhost:8080/api/v1
@@ -11,19 +11,10 @@ paths:
   /productos:
     get:
       summary: Listar productos con paginación y filtros
-      tags:
-        - Productos
+      tags: [Productos]
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 10
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
         - name: nombre
           in: query
           schema:
@@ -42,8 +33,7 @@ paths:
                 $ref: '#/components/schemas/ProductoPageResponseDTO'
     post:
       summary: Crear un nuevo producto
-      tags:
-        - Productos
+      tags: [Productos]
       requestBody:
         required: true
         content:
@@ -61,19 +51,10 @@ paths:
   /inventario/ajustes:
     get:
       summary: Listar ajustes de stock
-      tags:
-        - Ajuste de Stock
+      tags: [Ajuste de Stock]
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 10
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
         - name: idDeposito
           in: query
           schema:
@@ -88,8 +69,7 @@ paths:
                 $ref: '#/components/schemas/AjusteStockPageResponseDTO'
     post:
       summary: Crear un ajuste de stock (Formulario Cabecera-Detalle)
-      tags:
-        - Ajuste de Stock
+      tags: [Ajuste de Stock]
       requestBody:
         required: true
         content:
@@ -107,19 +87,10 @@ paths:
   /inventario/transferencias:
     get:
       summary: Listar transferencias de stock entre depósitos
-      tags:
-        - Transferencia de Stock
+      tags: [Transferencia de Stock]
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 0
-        - name: size
-          in: query
-          schema:
-            type: integer
-            default: 10
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
         - name: idDepositoOrigen
           in: query
           schema:
@@ -139,8 +110,7 @@ paths:
                 $ref: '#/components/schemas/TransferenciaStockPageResponseDTO'
     post:
       summary: Registrar una transferencia entre depósitos (Cabecera-Detalle)
-      tags:
-        - Transferencia de Stock
+      tags: [Transferencia de Stock]
       requestBody:
         required: true
         content:
@@ -156,14 +126,53 @@ paths:
                 $ref: '#/components/schemas/TransferenciaStockResponseDTO'
 
 components:
+  # -------------------------------------------------------------
+  # REUSABLE PARAMETERS
+  # -------------------------------------------------------------
+  parameters:
+    PageQuery:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 0
+    SizeQuery:
+      name: size
+      in: query
+      schema:
+        type: integer
+        default: 10
+
   schemas:
+    # -------------------------------------------------------------
+    # BASE SCHEMAS & UTILITIES
+    # -------------------------------------------------------------
+    BasePageResponse:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 45
+        totalPages:
+          type: integer
+          example: 5
+        isLast:
+          type: boolean
+          example: false
+
     # -------------------------------------------------------------
     # CATEGORÍAS & MARCAS DTOs
     # -------------------------------------------------------------
     CategoriaDTO:
       type: object
-      required:
-        - nombre
+      required: [nombre]
       properties:
         idCategoria:
           type: integer
@@ -181,8 +190,7 @@ components:
 
     MarcaDTO:
       type: object
-      required:
-        - nombre
+      required: [nombre]
       properties:
         idMarca:
           type: integer
@@ -197,25 +205,9 @@ components:
     # -------------------------------------------------------------
     # PRODUCTO DTOs
     # -------------------------------------------------------------
-    ProductoRequestDTO:
+    BaseProducto:
       type: object
-      required:
-        - idCategoria
-        - idMarca
-        - nombre
-        - precioCosto
-        - precioVenta
-        - porcentajeIva
-        - stockMinimo
       properties:
-        idCategoria:
-          type: integer
-          format: int64
-          example: 1
-        idMarca:
-          type: integer
-          format: int64
-          example: 1
         codigoBarra:
           type: string
           maxLength: 60
@@ -249,52 +241,48 @@ components:
           type: boolean
           default: true
 
+    ProductoRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/BaseProducto'
+        - type: object
+          required:
+            - idCategoria
+            - idMarca
+            - nombre
+            - precioCosto
+            - precioVenta
+            - porcentajeIva
+            - stockMinimo
+          properties:
+            idCategoria:
+              type: integer
+              format: int64
+              example: 1
+            idMarca:
+              type: integer
+              format: int64
+              example: 1
+
     ProductoResponseDTO:
-      type: object
-      properties:
-        idProducto:
-          type: integer
-          format: int64
-          example: 101
-        categoria:
-          $ref: '#/components/schemas/CategoriaDTO'
-        marca:
-          $ref: '#/components/schemas/MarcaDTO'
-        codigoBarra:
-          type: string
-          example: "7840001234567"
-        nombre:
-          type: string
-          example: Leche Entera 1L
-        descripcion:
-          type: string
-          example: Leche ultra pasteurizada cartón 1 litro
-        precioCosto:
-          type: number
-          format: double
-          example: 4500.00
-        precioVenta:
-          type: number
-          format: double
-          example: 6000.00
-        porcentajeIva:
-          type: number
-          format: double
-          example: 10.00
-        stockMinimo:
-          type: integer
-          example: 10
-        estado:
-          type: boolean
-          example: true
+      allOf:
+        - $ref: '#/components/schemas/BaseProducto'
+        - type: object
+          properties:
+            idProducto:
+              type: integer
+              format: int64
+              example: 101
+            categoria:
+              $ref: '#/components/schemas/CategoriaDTO'
+            marca:
+              $ref: '#/components/schemas/MarcaDTO'
 
     # -------------------------------------------------------------
     # DEPÓSITO & STOCK DTOs
     # -------------------------------------------------------------
     DepositoDTO:
       type: object
-      required:
-        - nombre
+      required: [nombre]
       properties:
         idDeposito:
           type: integer
@@ -343,9 +331,7 @@ components:
     # -------------------------------------------------------------
     AjusteStockDetalleRequestDTO:
       type: object
-      required:
-        - idProducto
-        - cantidad
+      required: [idProducto, cantidad]
       properties:
         idProducto:
           type: integer
@@ -358,12 +344,7 @@ components:
 
     AjusteStockRequestDTO:
       type: object
-      required:
-        - idDeposito
-        - idEmpleado
-        - motivo
-        - tipoAjuste
-        - detalles
+      required: [idDeposito, idEmpleado, motivo, tipoAjuste, detalles]
       properties:
         idDeposito:
           type: integer
@@ -446,13 +427,11 @@ components:
             $ref: '#/components/schemas/AjusteStockDetalleResponseDTO'
 
     # -------------------------------------------------------------
-    # TRANSFERENCIAS STOCK
+    # TRANSFERENCIAS STOCK DTOs
     # -------------------------------------------------------------
     TransferenciaStockDetalleRequestDTO:
       type: object
-      required:
-        - idProducto
-        - cantidad
+      required: [idProducto, cantidad]
       properties:
         idProducto:
           type: integer
@@ -465,11 +444,7 @@ components:
 
     TransferenciaStockRequestDTO:
       type: object
-      required:
-        - idDepositoOrigen
-        - idDepositoDestino
-        - idEmpleado
-        - detalles
+      required: [idDepositoOrigen, idDepositoDestino, idEmpleado, detalles]
       properties:
         idDepositoOrigen:
           type: integer
@@ -557,77 +532,35 @@ components:
           items:
             $ref: '#/components/schemas/TransferenciaStockDetalleResponseDTO'
 
-    TransferenciaStockPageResponseDTO:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/TransferenciaStockResponseDTO'
-        pageNumber:
-          type: integer
-          example: 0
-        pageSize:
-          type: integer
-          example: 10
-        totalElements:
-          type: integer
-          format: int64
-          example: 8
-        totalPages:
-          type: integer
-          example: 1
-        isLast:
-          type: boolean
-          example: true
-
     # -------------------------------------------------------------
-    # RESPUESTAS PAGINADAS (GENÉRICAS PARA SWAGGER)
+    # RESPUESTAS PAGINADAS (UTILIZANDO INHERITANCE)
     # -------------------------------------------------------------
     ProductoPageResponseDTO:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductoResponseDTO'
-        pageNumber:
-          type: integer
-          example: 0
-        pageSize:
-          type: integer
-          example: 10
-        totalElements:
-          type: integer
-          format: int64
-          example: 45
-        totalPages:
-          type: integer
-          example: 5
-        isLast:
-          type: boolean
-          example: false
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductoResponseDTO'
 
     AjusteStockPageResponseDTO:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/AjusteStockResponseDTO'
-        pageNumber:
-          type: integer
-          example: 0
-        pageSize:
-          type: integer
-          example: 10
-        totalElements:
-          type: integer
-          format: int64
-          example: 12
-        totalPages:
-          type: integer
-          example: 2
-        isLast:
-          type: boolean
-          example: false
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/AjusteStockResponseDTO'
+
+    TransferenciaStockPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransferenciaStockResponseDTO'

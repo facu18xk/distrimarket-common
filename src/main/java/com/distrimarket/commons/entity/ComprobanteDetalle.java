@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class ComprobanteDetalle {
+public abstract class ComprobanteDetalle extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_producto", nullable = false)

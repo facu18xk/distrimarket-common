@@ -15,11 +15,6 @@ import java.util.List;
 @Builder
 public class AjusteStock extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_ajuste")
-    private Long idAjuste;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito", nullable = false)
     private Deposito deposito;

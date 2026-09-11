@@ -15,11 +15,6 @@ import java.time.LocalDate;
 @Builder
 public class Empleado extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_empleado")
-    private Long id;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
     private Persona persona;

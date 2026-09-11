@@ -20,11 +20,6 @@ import java.util.List;
 @Builder
 public class FacturaCompra extends Comprobante {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_factura_compra")
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Proveedor proveedor;

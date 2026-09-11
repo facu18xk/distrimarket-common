@@ -14,11 +14,6 @@ import java.util.List;
 @Builder
 public class TransferenciaStock extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transferencia")
-    private Long idTransferencia;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito_origen", nullable = false)
     private Deposito depositoOrigen;

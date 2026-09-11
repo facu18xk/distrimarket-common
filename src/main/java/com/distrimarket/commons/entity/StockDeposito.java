@@ -17,11 +17,6 @@ import lombok.*;
 @Builder
 public class StockDeposito extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_stock")
-    private Long idStock;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito", nullable = false)
     private Deposito deposito;
