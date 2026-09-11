@@ -221,17 +221,14 @@ components:
           example: Leche ultra pasteurizada cartón 1 litro
         precioCosto:
           type: number
-          format: double
           minimum: 0
           example: 4500.00
         precioVenta:
           type: number
-          format: double
           minimum: 0
           example: 6000.00
         porcentajeIva:
           type: number
-          format: double
           example: 10.00
         stockMinimo:
           type: integer
@@ -326,6 +323,13 @@ components:
           type: integer
           example: 150
 
+    TipoAjuste:
+      type: string
+      enum:
+        - POSITIVO
+        - NEGATIVO
+      example: NEGATIVO
+
     # -------------------------------------------------------------
     # CABECERA-DETALLE: AJUSTE DE STOCK DTOs
     # -------------------------------------------------------------
@@ -359,9 +363,7 @@ components:
           maxLength: 200
           example: Rotura de empaque en depósito
         tipoAjuste:
-          type: string
-          enum: [POSITIVO, NEGATIVO]
-          example: NEGATIVO
+          $ref: '#/components/schemas/TipoAjuste'
         detalles:
           type: array
           minItems: 1
@@ -418,9 +420,7 @@ components:
           type: string
           example: Rotura de empaque en depósito
         tipoAjuste:
-          type: string
-          enum: [POSITIVO, NEGATIVO]
-          example: NEGATIVO
+          $ref: '#/components/schemas/TipoAjuste'
         detalles:
           type: array
           items:

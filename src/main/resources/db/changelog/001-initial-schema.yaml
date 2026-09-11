@@ -1,0 +1,1202 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-personas
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: personas
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_personas
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: tipo_persona
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ci
+                  type: VARCHAR(20)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_personas_ci
+              - column:
+                  name: ruc
+                  type: VARCHAR(20)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_personas_ruc
+              - column:
+                  name: nombre_completo
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telefono
+                  type: VARCHAR(30)
+              - column:
+                  name: correo
+                  type: VARCHAR(100)
+              - column:
+                  name: direccion
+                  type: VARCHAR(200)
+
+  - changeSet:
+      id: 002-create-roles
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_roles
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_roles_nombre
+
+  - changeSet:
+      id: 003-create-categorias
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: categorias
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_categorias
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre
+                  type: VARCHAR(80)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_categorias_nombre
+              - column:
+                  name: descripcion
+                  type: VARCHAR(200)
+
+  - changeSet:
+      id: 004-create-marcas
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: marcas
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_marcas
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre
+                  type: VARCHAR(80)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_marcas_nombre
+
+  - changeSet:
+      id: 005-create-depositos
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: depositos
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_depositos
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre
+                  type: VARCHAR(80)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_depositos_nombre
+              - column:
+                  name: ubicacion
+                  type: VARCHAR(150)
+              - column:
+                  name: estado
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+
+  - changeSet:
+      id: 006-create-medios-pago
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: medios_pago
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_medios_pago
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_medios_pago_nombre
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 007-create-timbrado
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: timbrado
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_timbrado
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: numero_timbrado
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_timbrado_numero
+              - column:
+                  name: fecha_inicio
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_vencimiento
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: punto_expedicion
+                  type: VARCHAR(3)
+                  defaultValue: "001"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sucursal
+                  type: VARCHAR(3)
+                  defaultValue: "001"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 008-create-configuraciones
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: configuraciones
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_configuraciones
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: clave
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_configuraciones_clave
+              - column:
+                  name: valor
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descripcion
+                  type: VARCHAR(200)
+
+  - changeSet:
+      id: 009-create-contacto-mensajes
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: contacto_mensajes
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_contacto_mensajes
+                    nullable: false
+              - column:
+                  name: fecha_envio
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: nombre_remitente
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: correo_remitente
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: asunto
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mensaje
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: atendido
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 010-create-campanias-promocion
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: campanias_promocion
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_campanias_promocion
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: titulo
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cuerpo_html
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_envio
+                  type: TIMESTAMP
+              - column:
+                  name: enviado
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 011-create-clientes
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: clientes
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_clientes
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_persona
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_clientes_persona
+                    foreignKeyName: fk_clientes_persona
+                    references: personas(id)
+              - column:
+                  name: estado
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 012-create-proveedores
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: proveedores
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_proveedores
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_persona
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_proveedores_persona
+                    foreignKeyName: fk_proveedores_persona
+                    references: personas(id)
+              - column:
+                  name: nombre_fantasia
+                  type: VARCHAR(150)
+              - column:
+                  name: estado
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 013-create-empleados
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: empleados
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_empleados
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_persona
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_empleados_persona
+                    foreignKeyName: fk_empleados_persona
+                    references: personas(id)
+              - column:
+                  name: cargo
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_ingreso
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: estado
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 014-create-usuarios
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: usuarios
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_usuarios
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_persona
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_usuarios_persona
+                    foreignKeyName: fk_usuarios_persona
+                    references: personas(id)
+              - column:
+                  name: id_rol
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_usuarios_rol
+                    references: roles(id)
+              - column:
+                  name: username
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_usuarios_username
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 015-create-productos
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: productos
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_productos
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_categoria
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_productos_categoria
+                    references: categorias(id)
+              - column:
+                  name: id_marca
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_productos_marca
+                    references: marcas(id)
+              - column:
+                  name: codigo_barra
+                  type: VARCHAR(60)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_productos_codigo_barra
+              - column:
+                  name: nombre
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descripcion
+                  type: TEXT
+              - column:
+                  name: precio_costo
+                  type: NUMERIC(14, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: precio_venta
+                  type: NUMERIC(14, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: porcentaje_iva
+                  type: NUMERIC(5, 2)
+                  defaultValueNumeric: 10.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stock_minimo
+                  type: INT
+                  defaultValueNumeric: 5
+                  constraints:
+                    nullable: false
+              - column:
+                  name: estado
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+
+  - changeSet:
+      id: 016-create-stock-deposito
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: stock_deposito
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_stock_deposito
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_deposito
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_stock_deposito_deposito
+                    references: depositos(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_stock_deposito_producto
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: stock_deposito
+            columnNames: id_deposito, id_producto
+            constraintName: uq_deposito_producto
+
+  - changeSet:
+      id: 017-create-facturas-compras
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: facturas_compras
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_facturas_compras
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_deposito
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_compras_deposito
+                    references: depositos(id)
+              - column:
+                  name: id_medio_pago
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_compras_medio_pago
+                    references: medios_pago(id)
+              - column:
+                  name: id_proveedor
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_compras_proveedor
+                    references: proveedores(id)
+              - column:
+                  name: numero_factura
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timbrado
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_emision
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_iva
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_general
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: facturas_compras
+            columnNames: id_proveedor, numero_factura, timbrado
+            constraintName: uq_proveedor_factura
+
+  - changeSet:
+      id: 018-create-facturas-compras-detalle
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: facturas_compras_detalle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_facturas_compras_detalle
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_factura_compra
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_compras_det_factura
+                    references: facturas_compras(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_compras_det_prod
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: precio_unitario
+                  type: NUMERIC(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subtotal
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: porcentaje_iva
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 10.00
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 019-create-facturas-ventas
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: facturas_ventas
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_facturas_ventas
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_deposito
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_deposito
+                    references: depositos(id)
+              - column:
+                  name: id_medio_pago
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_medio_pago
+                    references: medios_pago(id)
+              - column:
+                  name: id_cliente
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_cliente
+                    references: clientes(id)
+              - column:
+                  name: id_empleado
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_empleado
+                    references: empleados(id)
+              - column:
+                  name: id_timbrado
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_timbrado
+                    references: timbrado(id)
+              - column:
+                  name: numero_factura
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_emision
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: estado
+                  type: VARCHAR(20)
+                  defaultValue: "EMITIDA"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_iva
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_general
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 020-create-facturas-ventas-detalle
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: facturas_ventas_detalle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_facturas_ventas_detalle
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_factura_venta
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_det_factura
+                    references: facturas_ventas(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_facturas_ventas_det_prod
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: precio_unitario
+                  type: NUMERIC(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subtotal
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+              - column:
+                  name: porcentaje_iva
+                  type: NUMERIC(19, 2)
+                  defaultValueNumeric: 10.00
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 021-create-ajuste-stock
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: ajuste_stock
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_ajuste_stock
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_deposito
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ajuste_stock_deposito
+                    references: depositos(id)
+              - column:
+                  name: id_empleado
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ajuste_stock_empleado
+                    references: empleados(id)
+              - column:
+                  name: motivo
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tipo_ajuste
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 022-create-ajuste-stock-detalle
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: ajuste_stock_detalle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_ajuste_stock_detalle
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_ajuste
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ajuste_stock_det_ajuste
+                    references: ajuste_stock(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ajuste_stock_det_prod
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 023-create-transferencias-stock
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: transferencias_stock
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_transferencias_stock
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_deposito_origen
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transf_stock_dep_origen
+                    references: depositos(id)
+              - column:
+                  name: id_deposito_destino
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transf_stock_dep_destino
+                    references: depositos(id)
+              - column:
+                  name: id_empleado
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transf_stock_empleado
+                    references: empleados(id)
+              - column:
+                  name: observacion
+                  type: VARCHAR(255)
+              - column:
+                  name: estado
+                  type: VARCHAR(20)
+                  defaultValue: "COMPLETADO"
+
+  - changeSet:
+      id: 024-create-transferencias-stock-detalle
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: transferencias_stock_detalle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_transferencias_stock_detalle
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_transferencia
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transf_stock_det_transf
+                    references: transferencias_stock(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transf_stock_det_prod
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  constraints:
+                    nullable: false
