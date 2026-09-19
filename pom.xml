@@ -11,11 +11,14 @@
         <relativePath/>
     </parent>
 
-    <groupId>org.example</groupId>
+    <groupId>com.distrimarket</groupId>
     <artifactId>distrimarket-common</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>distrimarket-common</name>
+    <description>Biblioteca compartida con entidades JPA, DTOs y utilidades para el ecosistema Distrimarket</description>
 
     <properties>
+        <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -75,6 +78,7 @@
     </dependencies>
     <build>
         <plugins>
+            <!-- 1. Compilación con soporte de Lombok -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -88,7 +92,39 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <!-- Plugin para generar los DTOs a partir de openapi.yaml -->
+            <!-- 2. Registrar código fuente generado por OpenAPI en el build path del IDE y compilador -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-openapi-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 3. Empaquetar JAR de fuentes (-sources.jar) para autocompletado y Javadoc en los microservicios -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 4. Plugin para generar los DTOs a partir de openapi.yaml -->
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -138,6 +174,8 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <!-- NOTA: Se omite intencionalmente 'spring-boot-maven-plugin' para asegurar
+                 que se genere un JAR estándar de librería y no un Fat JAR ejecutable (BOOT-INF). -->
         </plugins>
     </build>
 
