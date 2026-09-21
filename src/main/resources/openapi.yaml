@@ -33,6 +33,10 @@ tags:
     description: Gestión de empleados, roles de sistema y cargos en sucursales.
   - name: Administracion-General
     description: Catálogo de medios de pago, depósitos y parámetros del sistema.
+  - name: Categorias
+    description: Endpoints para la gestión de categorías de productos.
+  - name: Marcas
+    description: Endpoints para la gestión de marcas de productos.
 
 # =============================================================
 # 2. PATHS (RUTAS RESTful)
@@ -102,6 +106,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoDetailResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Productos]
+      summary: Actualizar un producto existente
+      operationId: updateProducto
+      parameters:
+        - name: idProducto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoCreateDTO'
+      responses:
+        '200':
+          description: Producto actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoDetailResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Productos]
+      summary: Eliminar producto por ID
+      operationId: deleteProducto
+      parameters:
+        - name: idProducto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Producto eliminado con éxito
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -513,6 +561,224 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConfiguracionDTO'
+  # ==========================================
+  # ENDPOINTS DE CATEGORÍAS
+  # ==========================================
+  /categorias:
+    get:
+      tags: [Categorias]
+      summary: Obtener lista paginada de categorías
+      operationId: listarCategorias
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista paginada obtenida con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+    post:
+      tags: [Categorias]
+      summary: Crear una nueva categoría
+      operationId: crearCategoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaRequestDTO'
+      responses:
+        '201':
+          description: Categoría creada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /categorias/{idCategoria}:
+    get:
+      tags: [Categorias]
+      summary: Obtener categoría por ID
+      operationId: obtenerCategoriaPorId
+      parameters:
+        - name: idCategoria
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Categorias]
+      summary: Actualizar una categoría existente
+      operationId: updateCategoria
+      parameters:
+        - name: idCategoria
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaRequestDTO'
+      responses:
+        '200':
+          description: Categoría actualizada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Categorias]
+      summary: Eliminar categoría por ID
+      operationId: deleteCategoria
+      parameters:
+        - name: idCategoria
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Categoría eliminada con éxito
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /marcas:
+    get:
+      tags: [Marcas]
+      summary: Obtener lista paginada de marcas
+      operationId: listarMarcas
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista paginada obtenida con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarcaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+    post:
+      tags: [Marcas]
+      summary: Crear una nueva marca
+      operationId: crearMarca
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarcaRequestDTO'
+      responses:
+        '201':
+          description: Marca creada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /marcas/{idMarca}:
+    get:
+      tags: [Marcas]
+      summary: Obtener marca por ID
+      operationId: obtenerMarcaPorId
+      parameters:
+        - name: idMarca
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Marca encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarcaResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Marcas]
+      summary: Actualizar una marca existente
+      operationId: updateMarca
+      parameters:
+        - name: idMarca
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarcaRequestDTO'
+      responses:
+        '200':
+          description: Marca actualizada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarcaResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Marcas]
+      summary: Eliminar marca por ID
+      operationId: deleteMarca
+      parameters:
+        - name: idMarca
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Marca eliminada con éxito
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
 # =============================================================
 # 3. COMPONENTS (REUTILIZACIÓN CENTRALIZADA)
@@ -551,6 +817,24 @@ components:
       schema:
         type: string
         example: "fechaEmision,desc"
+
+    SortByQuery:
+      name: sortBy
+      in: query
+      description: Ordenar por id
+      required: false
+      schema:
+        type: string
+        example: id
+
+    SortDirQuery:
+      name: sortDir
+      in: query
+      description: Ordenar alfabéticamente
+      required: false
+      schema:
+        type: string
+        example: asc
 
     FilterNombreQuery:
       name: nombre
@@ -1407,6 +1691,66 @@ components:
           type: boolean
           example: true
 
+    # ==========================================
+    # DTOs DE CATEGORÍA
+    # ==========================================
+    CategoriaRequestDTO:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+          example: "Bebidas"
+          description: "Nombre único de la categoría"
+        descripcion:
+          type: string
+          maxLength: 200
+          example: "Gaseosas, jugos y bebidas alcohólicas"
+          description: "Descripción detallada de la categoría"
+
+    CategoriaResponseDTO:
+      type: object
+      required: [idCategoria, nombre, descripcion]
+      properties:
+        idCategoria:
+          type: integer
+          format: int64
+          example: 1
+          description: "Identificador único de la categoría"
+        nombre:
+          type: string
+          example: "Bebidas"
+        descripcion:
+          type: string
+          example: "Gaseosas, jugos y bebidas alcohólicas"
+
+    # ==========================================
+    # DTOs DE MARCA
+    # ==========================================
+    MarcaRequestDTO:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+          example: "Coca-Cola"
+          description: "Nombre único de la marca"
+
+    MarcaResponseDTO:
+      type: object
+      required: [idMarca, nombre]
+      properties:
+        idMarca:
+          type: integer
+          format: int64
+          example: 1
+          description: "Identificador único de la marca"
+        nombre:
+          type: string
+          example: "Coca-Cola"
+
     # ---------------------------------------------------------
     # RESPUESTAS PAGINADAS (Heredan de BasePageResponse)
     # ---------------------------------------------------------
@@ -1420,6 +1764,28 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProductoDetailResponseDTO'
+
+    CategoriaPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoriaResponseDTO'
+
+    MarcaPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [ content ]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarcaResponseDTO'
 
     FacturaCompraPageResponseDTO:
       allOf:

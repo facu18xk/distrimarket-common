@@ -3,6 +3,7 @@ package com.distrimarket.commons.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "productos")
@@ -10,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Producto extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
