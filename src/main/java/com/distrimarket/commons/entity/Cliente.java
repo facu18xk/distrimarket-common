@@ -2,6 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "clientes")
@@ -9,7 +10,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Cliente extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)

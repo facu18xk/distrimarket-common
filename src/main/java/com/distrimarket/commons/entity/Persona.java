@@ -3,6 +3,7 @@ package com.distrimarket.commons.entity;
 import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "personas")
@@ -10,7 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Persona extends BaseEntity {
 
     @Enumerated(EnumType.STRING)

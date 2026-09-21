@@ -2,6 +2,8 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDate;
 
 @Entity
@@ -10,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Timbrado extends BaseEntity{
 
     @Column(name = "numero_timbrado", nullable = false, unique = true, length = 20)

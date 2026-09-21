@@ -2,6 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
@@ -14,7 +15,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class StockDeposito extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

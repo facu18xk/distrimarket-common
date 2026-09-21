@@ -2,6 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class FacturaCompra extends Comprobante {
 
     @ManyToOne(fetch = FetchType.LAZY)
