@@ -37,6 +37,8 @@ tags:
     description: Endpoints para la gestión de categorías de productos.
   - name: Marcas
     description: Endpoints para la gestión de marcas de productos.
+  - name: Depositos
+    description: Endpoints para la gestión de depósitos de productos.
 
 # =============================================================
 # 2. PATHS (RUTAS RESTful)
@@ -777,6 +779,117 @@ paths:
       responses:
         '204':
           description: Marca eliminada con éxito
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # ==========================================
+  # ENDPOINTS DE DEPÓSITOS
+  # ==========================================
+  /depositos:
+    get:
+      tags: [Depositos]
+      summary: Obtener lista paginada de depósitos
+      operationId: listarDepositos
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista paginada obtenida con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+    post:
+      tags: [Depositos]
+      summary: Crear un nuevo depósito
+      operationId: crearDeposito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositoRequestDTO'
+      responses:
+        '201':
+          description: Depósito creado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /depositos/{idDeposito}:
+    get:
+      tags: [Depositos]
+      summary: Obtener depósito por ID
+      operationId: obtenerDepositoPorId
+      parameters:
+        - name: idDeposito
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Depósito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarcaResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Depositos]
+      summary: Actualizar un depósito existente
+      operationId: updateDeposito
+      parameters:
+        - name: idDeposito
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositoRequestDTO'
+      responses:
+        '200':
+          description: Marca actualizada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositoResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Depositos]
+      summary: Eliminar depósito por ID
+      operationId: deleteDeposito
+      parameters:
+        - name: idDeposito
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Depósito eliminado con éxito
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -1751,6 +1864,48 @@ components:
           type: string
           example: "Coca-Cola"
 
+    # ==========================================
+    # DTOs DE DEPÓSITO
+    # ==========================================
+    DepositoRequestDTO:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+          example: "Depósito Central"
+          description: "Nombre único del depósito"
+        ubicacion:
+          type: string
+          maxLength: 150
+          example: "Av. Principal 123, Bodega A"
+          description: "Dirección o ubicación física del depósito"
+        estado:
+          type: boolean
+          default: true
+          example: true
+          description: "Estado operativo del depósito (activo/inactivo)"
+
+    DepositoResponseDTO:
+      type: object
+      required: [idDeposito, nombre, ubicacion, estado]
+      properties:
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+          description: "Identificador único del depósito"
+        nombre:
+          type: string
+          example: "Depósito Central"
+        ubicacion:
+          type: string
+          example: "Av. Principal 123, Bodega A"
+        estado:
+          type: boolean
+          example: true
+
     # ---------------------------------------------------------
     # RESPUESTAS PAGINADAS (Heredan de BasePageResponse)
     # ---------------------------------------------------------
@@ -1786,6 +1941,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+
+    DepositoPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [ content ]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepositoResponseDTO'
 
     FacturaCompraPageResponseDTO:
       allOf:
