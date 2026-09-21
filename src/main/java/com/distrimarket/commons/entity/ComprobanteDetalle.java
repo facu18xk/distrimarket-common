@@ -2,6 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,9 +30,11 @@ public abstract class ComprobanteDetalle extends BaseEntity {
     private BigDecimal precioUnitario;
 
     @Column(nullable = false)
+    @Builder.Default
     private BigDecimal subtotal = BigDecimal.ZERO;
 
     @Column(name = "porcentaje_iva", nullable = false)
+    @Builder.Default
     private BigDecimal porcentajeIva = new BigDecimal("10.00");
 
     // Lógica POO compartida para compras y ventas

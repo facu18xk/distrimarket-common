@@ -2,6 +2,7 @@ package com.distrimarket.commons.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,9 +35,11 @@ public abstract class Comprobante extends BaseEntity {
     private LocalDate fechaEmision;
 
     @Column(name = "total_iva", nullable = false)
+    @Builder.Default
     private BigDecimal totalIva = BigDecimal.ZERO;
 
     @Column(name = "total_general", nullable = false)
+    @Builder.Default
     private BigDecimal totalGeneral = BigDecimal.ZERO;
 
     // Aquí evitamos poner @PrePersist de fecha_emision porque
