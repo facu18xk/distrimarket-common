@@ -1,571 +1,42 @@
 openapi: 3.0.3
 info:
   title: DistriMarket API - Módulo Inventarios
-  description: Contrato API y DTOs optimizados para Productos, Marcas, Categorías, Depósitos y Ajustes de Stock.
+  description: Contrato API y DTOs optimizados para Productos, Marcas, Categorías, Depósitos, Ajustes de Stock y Transferencias de Stock.
   version: 1.0.0
 servers:
   - url: http://localhost:8080/api/v1
     description: Servidor Local de Desarrollo
 
 # =============================================================
-# 1. TAGS GLOBALES (Agrupación formal sin espacios en nombres)
+# 1. TAGS GLOBALES
 # =============================================================
 tags:
-  - name: Productos
-    description: Catálogo maestro de productos, precios y márgenes de ganancia.
-  - name: Inventario-Stock
-    description: Consulta de existencias físicas consolidadas por depósito.
-  - name: Ajustes-Stock
-    description: Correcciones de stock por mermas, vencimientos o sobrantes físicos.
-  - name: Transferencias-Stock
-    description: Movimientos de mercadería entre depósitos centrales y sucursales.
-  - name: Compras-Facturas
-    description: Registro de facturas de compra a proveedores con incremento automático de existencias.
-  - name: Compras-Proveedores
-    description: Padrón de proveedores comerciales (con Persona Jurídica o Física asociada).
-  - name: Ventas-Facturas
-    description: Emisión y anulación de comprobantes de venta con timbrado fiscal y descuento de stock.
-  - name: Ventas-Clientes
-    description: Registro y consulta de clientes corporativos y consumidores finales.
-  - name: Ventas-Timbrados
-    description: Administración de timbrados legales de la empresa, sucursales y puntos de expedición.
-  - name: Personal-Empleados
-    description: Gestión de empleados, roles de sistema y cargos en sucursales.
-  - name: Administracion-General
-    description: Catálogo de medios de pago, depósitos y parámetros del sistema.
   - name: Categorias
     description: Endpoints para la gestión de categorías de productos.
   - name: Marcas
     description: Endpoints para la gestión de marcas de productos.
+  - name: Productos
+    description: Endpoints para la gestión de productos.
   - name: Depositos
     description: Endpoints para la gestión de depósitos de productos.
+  - name: Stocks
+    description: Endpoints para la gestión de stock en los depósitos de productos.
+  - name: Personas
+    description: Endpoints para la gestión de personas.
+  - name: Empleados
+    description: Endpoints para la gestión de empleados.
+  - name: Ajustes-Stock
+    description: Endpoints para correcciones de stock por mermas, vencimientos o sobrantes físicos.
+  - name: Transferencias-Stock
+    description: Movimientos de mercadería entre depósitos centrales y sucursales.
 
 # =============================================================
 # 2. PATHS (RUTAS RESTful)
 # =============================================================
 paths:
   # -----------------------------------------------------------
-  # INVENTARIOS: PRODUCTOS Y STOCK
+  # PATHS - CATEGORÍAS
   # -----------------------------------------------------------
-  /productos:
-    get:
-      summary: Listar productos con paginación y filtros
-      tags: [Productos]
-      operationId: listarProductos
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortQuery'
-        - $ref: '#/components/parameters/FilterNombreQuery'
-        - $ref: '#/components/parameters/FilterCategoriaQuery'
-        - $ref: '#/components/parameters/FilterMarcaQuery'
-        - $ref: '#/components/parameters/FilterEstadoQuery'
-      responses:
-        '200':
-          description: Catálogo paginado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductoPageResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedResponse'
-
-    post:
-      summary: Crear un nuevo producto
-      tags: [Productos]
-      operationId: crearProducto
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductoCreateDTO'
-      responses:
-        '201':
-          description: Producto creado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductoDetailResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '409':
-          $ref: '#/components/responses/ConflictResponse'
-
-  /productos/{idProducto}:
-    get:
-      summary: Detalle de producto por ID
-      tags: [Productos]
-      operationId: obtenerProductoPorId
-      parameters:
-        - $ref: '#/components/parameters/ProductoIdPath'
-      responses:
-        '200':
-          description: Ficha del producto
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductoDetailResponseDTO'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-    put:
-      tags: [Productos]
-      summary: Actualizar un producto existente
-      operationId: updateProducto
-      parameters:
-        - name: idProducto
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductoCreateDTO'
-      responses:
-        '200':
-          description: Producto actualizado con éxito
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductoDetailResponseDTO'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-    delete:
-      tags: [Productos]
-      summary: Eliminar producto por ID
-      operationId: deleteProducto
-      parameters:
-        - name: idProducto
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Producto eliminado con éxito
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-  /inventario/stock:
-    get:
-      summary: Consulta de existencias consolidadas por depósito
-      tags: [Inventario-Stock]
-      operationId: consultarStock
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/FilterDepositoQuery'
-        - $ref: '#/components/parameters/FilterNombreQuery'
-      responses:
-        '200':
-          description: Lista de stock por producto y depósito
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockDepositoPageResponseDTO'
-
-  # -----------------------------------------------------------
-  # COMPRAS: FACTURAS Y PROVEEDORES
-  # -----------------------------------------------------------
-  /compras/facturas:
-    get:
-      summary: Listar facturas de compra con paginación y filtros
-      tags: [Compras-Facturas]
-      operationId: listarFacturasCompra
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortQuery'
-        - $ref: '#/components/parameters/FilterProveedorQuery'
-        - $ref: '#/components/parameters/FilterDepositoQuery'
-        - $ref: '#/components/parameters/FilterFechaDesdeQuery'
-        - $ref: '#/components/parameters/FilterFechaHastaQuery'
-        - $ref: '#/components/parameters/FilterNumeroFacturaQuery'
-      responses:
-        '200':
-          description: Listado paginado de facturas de compra
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaCompraPageResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenResponse'
-
-    post:
-      summary: Registrar factura de compra (Cabecera y Detalle)
-      description: |
-        Registra una compra a proveedor.
-        - Valida restricción única: (idProveedor + numeroFactura + timbrado).
-        - Incrementa automáticamente el stock en el depósito receptor.
-        - Calcula subtotales, total IVA y total general.
-      tags: [Compras-Facturas]
-      operationId: registrarFacturaCompra
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FacturaCompraRequestDTO'
-      responses:
-        '201':
-          description: Factura de compra registrada e inventario actualizado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaCompraResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-        '409':
-          description: Factura ya registrada para este proveedor y timbrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseDTO'
-              example:
-                timestamp: "2026-09-17T12:00:00Z"
-                status: 409
-                error: "Conflict"
-                message: "Ya existe una factura registrada con ese número y timbrado para el proveedor indicado"
-                path: "/api/v1/compras/facturas"
-
-  /compras/facturas/{idFacturaCompra}:
-    get:
-      summary: Obtener el detalle completo de una factura de compra
-      tags: [Compras-Facturas]
-      operationId: obtenerFacturaCompraPorId
-      parameters:
-        - $ref: '#/components/parameters/FacturaCompraIdPath'
-      responses:
-        '200':
-          description: Comprobante de compra con todos sus renglones
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaCompraResponseDTO'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-  /compras/proveedores:
-    get:
-      summary: Listar proveedores comerciales
-      tags: [Compras-Proveedores]
-      operationId: listarProveedores
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/FilterNombreQuery'
-        - $ref: '#/components/parameters/FilterEstadoQuery'
-      responses:
-        '200':
-          description: Padrón de proveedores paginado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProveedorPageResponseDTO'
-
-    post:
-      summary: Registrar nuevo proveedor (Reutiliza PersonaCreateDTO)
-      tags: [Compras-Proveedores]
-      operationId: crearProveedor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProveedorRequestDTO'
-      responses:
-        '201':
-          description: Proveedor registrado exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProveedorResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '409':
-          $ref: '#/components/responses/ConflictResponse'
-
-  /compras/proveedores/{idProveedor}:
-    get:
-      summary: Consultar proveedor por ID
-      tags: [Compras-Proveedores]
-      operationId: obtenerProveedorPorId
-      parameters:
-        - $ref: '#/components/parameters/ProveedorIdPath'
-      responses:
-        '200':
-          description: Datos del proveedor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProveedorResponseDTO'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-  # -----------------------------------------------------------
-  # VENTAS: FACTURAS, CLIENTES Y TIMBRADOS
-  # -----------------------------------------------------------
-  /ventas/facturas:
-    get:
-      summary: Listar facturas de venta emitidas
-      tags: [Ventas-Facturas]
-      operationId: listarFacturasVenta
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortQuery'
-        - $ref: '#/components/parameters/FilterClienteQuery'
-        - $ref: '#/components/parameters/FilterEmpleadoQuery'
-        - $ref: '#/components/parameters/FilterDepositoQuery'
-        - $ref: '#/components/parameters/FilterEstadoVentaQuery'
-        - $ref: '#/components/parameters/FilterFechaDesdeQuery'
-        - $ref: '#/components/parameters/FilterFechaHastaQuery'
-      responses:
-        '200':
-          description: Listado paginado de facturas de venta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaVentaPageResponseDTO'
-
-    post:
-      summary: Emitir una nueva factura de venta fiscal
-      description: |
-        Emite una venta formal en mostrador o distribución:
-        - Valida que el timbrado esté vigente.
-        - Verifica y descuenta stock disponible en el depósito de expedición.
-        - Calcula subtotales, IVA según tasa de cada producto y total general.
-      tags: [Ventas-Facturas]
-      operationId: emitirFacturaVenta
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FacturaVentaRequestDTO'
-      responses:
-        '201':
-          description: Factura emitida exitosamente y stock descontado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaVentaResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-        '422':
-          description: Regla de negocio rota (Stock insuficiente o timbrado vencido)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseDTO'
-              example:
-                timestamp: "2026-09-17T12:00:00Z"
-                status: 422
-                error: "Unprocessable Entity"
-                message: "Stock insuficiente para 'Leche Entera 1L' en el depósito seleccionado (Disponible: 4, Solicitado: 10)"
-                path: "/api/v1/ventas/facturas"
-
-  /ventas/facturas/{idFacturaVenta}:
-    get:
-      summary: Obtener detalle y renglones de una factura de venta
-      tags: [Ventas-Facturas]
-      operationId: obtenerFacturaVentaPorId
-      parameters:
-        - $ref: '#/components/parameters/FacturaVentaIdPath'
-      responses:
-        '200':
-          description: Factura de venta con sus detalles
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaVentaResponseDTO'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-
-  /ventas/facturas/{idFacturaVenta}/anular:
-    post:
-      summary: Anular factura de venta
-      description: Cambia el estado a ANULADA y reincorpora el stock al depósito original.
-      tags: [Ventas-Facturas]
-      operationId: anularFacturaVenta
-      parameters:
-        - $ref: '#/components/parameters/FacturaVentaIdPath'
-      responses:
-        '200':
-          description: Factura anulada y stock devuelto al depósito
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FacturaVentaResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
-        '409':
-          $ref: '#/components/responses/ConflictResponse'
-
-  /ventas/clientes:
-    get:
-      summary: Listar clientes registrados
-      tags: [Ventas-Clientes]
-      operationId: listarClientes
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/FilterNombreQuery'
-        - $ref: '#/components/parameters/FilterEstadoQuery'
-      responses:
-        '200':
-          description: Padrón de clientes paginado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientePageResponseDTO'
-
-    post:
-      summary: Registrar un nuevo cliente (Reutiliza PersonaCreateDTO)
-      tags: [Ventas-Clientes]
-      operationId: crearCliente
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ClienteRequestDTO'
-      responses:
-        '201':
-          description: Cliente dado de alta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClienteResponseDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestResponse'
-        '409':
-          $ref: '#/components/responses/ConflictResponse'
-
-  /ventas/timbrados:
-    get:
-      summary: Listar timbrados fiscales de la empresa
-      tags: [Ventas-Timbrados]
-      operationId: listarTimbrados
-      responses:
-        '200':
-          description: Lista de timbrados autorizados
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimbradoDTO'
-
-    post:
-      summary: Registrar nuevo timbrado fiscal
-      tags: [Ventas-Timbrados]
-      operationId: crearTimbrado
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimbradoCreateDTO'
-      responses:
-        '201':
-          description: Timbrado dado de alta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TimbradoDTO'
-
-  # -----------------------------------------------------------
-  # PERSONAL: EMPLEADOS (Reutilización de PersonaDTO)
-  # -----------------------------------------------------------
-  /empleados:
-    get:
-      summary: Listar empleados de la empresa
-      tags: [Personal-Empleados]
-      operationId: listarEmpleados
-      parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/SizeQuery'
-      responses:
-        '200':
-          description: Nómina de empleados paginada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmpleadoPageResponseDTO'
-
-    post:
-      summary: Registrar un nuevo empleado
-      tags: [Personal-Empleados]
-      operationId: crearEmpleado
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmpleadoRequestDTO'
-      responses:
-        '201':
-          description: Empleado registrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmpleadoResponseDTO'
-
-  # -----------------------------------------------------------
-  # ADMINISTRACIÓN: MEDIOS DE PAGO Y CONFIGURACIONES
-  # -----------------------------------------------------------
-  /medios-pago:
-    get:
-      summary: Listar medios de pago habilitados (Efectivo, Tarjeta, Transferencia, Cheque)
-      tags: [Administracion-General]
-      operationId: listarMediosPago
-      responses:
-        '200':
-          description: Lista de medios de pago
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MedioPagoDTO'
-
-  /configuraciones:
-    get:
-      summary: Obtener parámetros globales de configuración
-      tags: [Administracion-General]
-      operationId: listarConfiguraciones
-      responses:
-        '200':
-          description: Lista clave-valor del sistema
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ConfiguracionDTO'
-  # ==========================================
-  # ENDPOINTS DE CATEGORÍAS
-  # ==========================================
   /categorias:
     get:
       tags: [Categorias]
@@ -587,6 +58,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
     post:
       tags: [Categorias]
@@ -607,6 +80,10 @@ paths:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /categorias/{idCategoria}:
     get:
@@ -627,6 +104,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -654,6 +135,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -671,9 +156,16 @@ paths:
       responses:
         '204':
           description: Categoría eliminada con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
+  # -----------------------------------------------------------
+  # PATHS - MARCAS
+  # -----------------------------------------------------------
   /marcas:
     get:
       tags: [Marcas]
@@ -695,6 +187,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
     post:
       tags: [Marcas]
@@ -715,6 +209,10 @@ paths:
                 $ref: '#/components/schemas/MarcaResponseDTO'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /marcas/{idMarca}:
     get:
@@ -735,6 +233,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -762,6 +264,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -779,12 +285,132 @@ paths:
       responses:
         '204':
           description: Marca eliminada con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
-  # ==========================================
-  # ENDPOINTS DE DEPÓSITOS
-  # ==========================================
+  # -----------------------------------------------------------
+  # PATHS - PRODUCTOS
+  # -----------------------------------------------------------
+  /productos:
+    get:
+      tags: [Productos]
+      summary: Listar productos con paginación y filtros
+      operationId: listarProductos
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/FilterNombreQuery'
+        - $ref: '#/components/parameters/FilterCategoriaQuery'
+        - $ref: '#/components/parameters/FilterMarcaQuery'
+        - $ref: '#/components/parameters/FilterEstadoQuery'
+      responses:
+        '200':
+          description: Catálogo paginado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+    post:
+      tags: [Productos]
+      summary: Crear un nuevo producto
+      operationId: crearProducto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoRequestDTO'
+      responses:
+        '201':
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+
+  /productos/{idProducto}:
+    get:
+      tags: [Productos]
+      summary: Detalle de producto por ID
+      operationId: obtenerProductoPorId
+      parameters:
+        - name: idProducto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ficha del producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Productos]
+      summary: Actualizar un producto existente
+      operationId: updateProducto
+      parameters:
+        - name: idProducto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoRequestDTO'
+      responses:
+        '200':
+          description: Producto actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductoResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Productos]
+      summary: Eliminar producto por ID
+      operationId: deleteProducto
+      parameters:
+        - name: idProducto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Producto eliminado con éxito
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # -----------------------------------------------------------
+  # PATHS - DEPÓSITOS
+  # -----------------------------------------------------------
   /depositos:
     get:
       tags: [Depositos]
@@ -806,6 +432,8 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
     post:
       tags: [Depositos]
@@ -826,6 +454,10 @@ paths:
                 $ref: '#/components/schemas/DepositoResponseDTO'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /depositos/{idDeposito}:
     get:
@@ -845,7 +477,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MarcaResponseDTO'
+                $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -873,6 +509,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
@@ -890,11 +530,541 @@ paths:
       responses:
         '204':
           description: Depósito eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
+  # -----------------------------------------------------------
+  # PATHS - STOCK DEPÓSITOS
+  # -----------------------------------------------------------
+  /stock-depositos:
+    get:
+      tags: [Stocks]
+      summary: Obtener lista paginada de existencias en depósito
+      operationId: listarStockDepositos
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista paginada obtenida con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockDepositoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    post:
+      tags: [Stocks]
+      summary: Asignar o inicializar stock de un producto en un depósito
+      operationId: crearStockDeposito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockDepositoRequestDTO'
+      responses:
+        '201':
+          description: Stock creado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /stock-depositos/{idStock}:
+    get:
+      tags: [Stocks]
+      summary: Obtener detalle de stock por ID
+      operationId: obtenerStockDepositoPorId
+      parameters:
+        - name: idStock
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Registro de stock encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      tags: [Stocks]
+      summary: Actualizar la cantidad de stock
+      operationId: updateStockDeposito
+      parameters:
+        - name: idStock
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockDepositoRequestDTO'
+      responses:
+        '200':
+          description: Stock actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    delete:
+      tags: [Stocks]
+      summary: Eliminar registro de stock
+      operationId: deleteStockDeposito
+      parameters:
+        - name: idStock
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Registro eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # -----------------------------------------------------------
+  # PATHS - PERSONAS
+  # -----------------------------------------------------------
+  /personas:
+    get:
+      tags: [Personas]
+      summary: Listar todas las personas (Físicas y Jurídicas)
+      operationId: listarPersonas
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista de personas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaPageResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    post:
+      tags: [Personas]
+      summary: Registrar una nueva persona
+      operationId: crearPersona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonaRequestDTO'
+      responses:
+        '201':
+          description: Persona creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /personas/{idPersona}:
+    get:
+      tags: [Personas]
+      summary: Obtener persona por ID
+      operationId: obtenerPersonaPorId
+      parameters:
+        - name: idPersona
+          in: path
+          required: true
+          description: ID de la persona
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Persona encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    put:
+      tags: [Personas]
+      summary: Actualizar datos de una persona
+      operationId: updatePersona
+      parameters:
+        - name: idPersona
+          in: path
+          required: true
+          description: ID de la persona a actualizar
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonaRequestDTO'
+      responses:
+        '200':
+          description: Persona actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    delete:
+      tags: [Personas]
+      summary: Eliminar persona
+      operationId: deletePersona
+      parameters:
+        - name: idPersona
+          in: path
+          required: true
+          description: ID de la persona a eliminar
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Persona eliminada correctamente
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # -----------------------------------------------------------
+  # PATHS - EMPLEADOS
+  # -----------------------------------------------------------
+  /empleados:
+    get:
+      tags: [Empleados]
+      summary: Listar todos los empleados
+      operationId: listarEmpleados
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Lista de empleados obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoPageResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    post:
+      tags: [Empleados]
+      summary: Registrar un nuevo empleado
+      operationId: crearEmpleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoRequestDTO'
+      responses:
+        '201':
+          description: Empleado registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /empleados/{idEmpleado}:
+    get:
+      tags: [Empleados]
+      summary: Obtener empleado por ID
+      operationId: obtenerEmpleadoPorId
+      parameters:
+        - name: idEmpleado
+          in: path
+          required: true
+          description: ID del empleado
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    put:
+      tags: [Empleados]
+      summary: Actualizar datos de un empleado
+      operationId: updateEmpleado
+      parameters:
+        - name: idEmpleado
+          in: path
+          required: true
+          description: ID del empleado a actualizar
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoRequestDTO'
+      responses:
+        '200':
+          description: Empleado actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    delete:
+      tags: [Empleados]
+      summary: Eliminar empleado
+      operationId: deleteEmpleado
+      parameters:
+        - name: idEmpleado
+          in: path
+          required: true
+          description: ID del empleado a eliminar
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Empleado eliminado correctamente
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  # -----------------------------------------------------------
+  # PATHS - AJUSTES DE STOCK
+  # -----------------------------------------------------------
+  /ajustes-stock:
+    get:
+      tags: [Ajustes-Stock]
+      summary: Historial paginado de ajustes de stock
+      operationId: listarAjustesStock
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortDirQuery'
+      responses:
+        '200':
+          description: Historial de ajustes obtenido con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AjusteStockResponseDTO'
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+    post:
+      tags: [Ajustes-Stock]
+      summary: Procesar y registrar un nuevo ajuste de stock
+      operationId: crearAjusteStock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AjusteStockRequestDTO'
+      responses:
+        '201':
+          description: Ajuste procesado e inventario actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AjusteStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /ajustes-stock/{idAjuste}:
+    get:
+      tags: [Ajustes-Stock]
+      summary: Obtener detalle completo de un ajuste de stock por ID
+      operationId: obtenerAjusteStockPorId
+      parameters:
+        - name: idAjuste
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ajuste encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AjusteStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # -----------------------------------------------------------
+  # PATHS - TRANSFERENCIAS DE STOCK
+  # -----------------------------------------------------------
+
+
+  # -----------------------------------------------------------
+  # ADMINISTRACIÓN: CONFIGURACIONES
+  # -----------------------------------------------------------
+  /configuraciones:
+    get:
+      summary: Obtener parámetros globales de configuración
+      tags: [Administracion-General]
+      operationId: listarConfiguraciones
+      responses:
+        '200':
+          description: Lista clave-valor del sistema
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfiguracionDTO'
+
 # =============================================================
-# 3. COMPONENTS (REUTILIZACIÓN CENTRALIZADA)
+# 3. COMPONENTS
 # =============================================================
 components:
   # -----------------------------------------------------------
@@ -978,22 +1148,6 @@ components:
         type: boolean
         default: true
 
-    FilterProveedorQuery:
-      name: idProveedor
-      in: query
-      description: Filtrar compras por ID de proveedor
-      schema:
-        type: integer
-        format: int64
-
-    FilterClienteQuery:
-      name: idCliente
-      in: query
-      description: Filtrar ventas por ID de cliente
-      schema:
-        type: integer
-        format: int64
-
     FilterEmpleadoQuery:
       name: idEmpleado
       in: query
@@ -1010,20 +1164,6 @@ components:
         type: integer
         format: int64
 
-    FilterNumeroFacturaQuery:
-      name: numeroFactura
-      in: query
-      description: Búsqueda exacta o parcial de número de factura
-      schema:
-        type: string
-
-    FilterEstadoVentaQuery:
-      name: estado
-      in: query
-      description: Estado de la factura de venta (EMITIDA, ANULADA)
-      schema:
-        $ref: '#/components/schemas/EstadoFacturaVenta'
-
     FilterFechaDesdeQuery:
       name: fechaDesde
       in: query
@@ -1039,46 +1179,6 @@ components:
       schema:
         type: string
         format: date
-
-    ProductoIdPath:
-      name: idProducto
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-
-    FacturaCompraIdPath:
-      name: idFacturaCompra
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-
-    FacturaVentaIdPath:
-      name: idFacturaVenta
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-
-    ProveedorIdPath:
-      name: idProveedor
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-
-    ClienteIdPath:
-      name: idCliente
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
 
   # -----------------------------------------------------------
   # RESPUESTAS DE ERROR REUTILIZABLES (RFC 7807)
@@ -1127,11 +1227,24 @@ components:
             $ref: '#/components/schemas/ErrorResponseDTO'
 
   # -----------------------------------------------------------
-  # SCHEMAS (DTOs)
+  # 4. SCHEMAS (DTOs)
   # -----------------------------------------------------------
   schemas:
     # ---------------------------------------------------------
-    # ESQUEMA DE ERROR ESTÁNDAR
+    # SCHEMA - DETALLE DE ERROR DE CAMPO
+    # ---------------------------------------------------------
+    FieldErrorDTO:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "detalles"
+        message:
+          type: string
+          example: "La factura debe tener al menos un producto"
+
+    # ---------------------------------------------------------
+    # SCHEMA - ERROR ESTÁNDAR
     # ---------------------------------------------------------
     ErrorResponseDTO:
       type: object
@@ -1140,6 +1253,7 @@ components:
         timestamp:
           type: string
           format: date-time
+          example: "2026-09-21T18:00:00Z"
         status:
           type: integer
           example: 400
@@ -1151,48 +1265,14 @@ components:
           example: "Validación de formulario fallida"
         path:
           type: string
-          example: "/api/v1/compras/facturas"
+          example: "/api/v1/ajustes-stock"
         details:
           type: array
           items:
-            type: object
-            properties:
-              field:
-                type: string
-                example: "detalles"
-              message:
-                type: string
-                example: "La factura debe tener al menos un producto"
+            $ref: '#/components/schemas/FieldErrorDTO'
 
     # ---------------------------------------------------------
-    # PAGINACIÓN BASE
-    # ---------------------------------------------------------
-    BasePageResponse:
-      type: object
-      required: [pageNumber, pageSize, totalElements, totalPages, isFirst, isLast]
-      properties:
-        pageNumber:
-          type: integer
-          example: 0
-        pageSize:
-          type: integer
-          example: 10
-        totalElements:
-          type: integer
-          format: int64
-          example: 85
-        totalPages:
-          type: integer
-          example: 9
-        isFirst:
-          type: boolean
-          example: true
-        isLast:
-          type: boolean
-          example: false
-
-    # ---------------------------------------------------------
-    # ENUMS
+    # SCHEMA - ENUMS
     # ---------------------------------------------------------
     TipoPersona:
       type: string
@@ -1200,549 +1280,88 @@ components:
         - FISICA
         - JURIDICA
       example: JURIDICA
+      description: Tipo de persona (FISICA o JURIDICA)
 
-    EstadoFacturaVenta:
+
+    TipoAjuste:
       type: string
       enum:
-        - EMITIDA
-        - ANULADA
-      example: EMITIDA
+        - POSITIVO
+        - NEGATIVO
+      example: "POSITIVO"
+      description: Tipo de ajuste de stock (POSITIVO o NEGATIVO)
+
 
     # ---------------------------------------------------------
-    # 🌟 REUTILIZACIÓN NÚCLEO: PERSONA DTO
-    # (Reutilizado por Cliente, Proveedor, Empleado y Usuario)
+    # SCHEMA - SOLICITUD DE CATEGORÍAS (Request)
     # ---------------------------------------------------------
-    PersonaBaseDTO:
+    CategoriaRequestDTO:
       type: object
-      required: [tipoPersona, nombreCompleto]
+      required: [nombre]
       properties:
-        tipoPersona:
-          $ref: '#/components/schemas/TipoPersona'
-        nombreCompleto:
-          type: string
-          maxLength: 150
-          description: Razón Social o Nombres y Apellidos
-          example: "Distribuidora del Este S.A."
-        ci:
-          type: string
-          maxLength: 20
-          description: Cédula de Identidad (Obligatoria si tipoPersona es FISICA)
-          example: "4123456"
-        ruc:
-          type: string
-          maxLength: 20
-          description: Registro Único de Contribuyente (Obligatorio si es JURIDICA)
-          example: "80012345-6"
-        telefono:
-          type: string
-          maxLength: 30
-          example: "+595 21 555 123"
-        correo:
-          type: string
-          format: email
-          maxLength: 100
-          example: "contacto@distrideleste.com"
-        direccion:
-          type: string
-          maxLength: 200
-          example: "Avda. Eusebio Ayala 2450"
-
-    PersonaCreateDTO:
-      allOf:
-        - $ref: '#/components/schemas/PersonaBaseDTO'
-
-    PersonaDTO:
-      allOf:
-        - $ref: '#/components/schemas/PersonaBaseDTO'
-        - type: object
-          required: [idPersona]
-          properties:
-            idPersona:
-              type: integer
-              format: int64
-              example: 10
-
-    # ---------------------------------------------------------
-    # PROVEEDOR (Composición limpia: Proveedor + Persona)
-    # ---------------------------------------------------------
-    ProveedorRequestDTO:
-      type: object
-      required: [persona]
-      properties:
-        nombreFantasia:
-          type: string
-          maxLength: 150
-          example: "Lácteos del Este"
-        estado:
-          type: boolean
-          default: true
-        persona:
-          description: Datos de la persona física o jurídica asociada
-          $ref: '#/components/schemas/PersonaCreateDTO'
-
-    ProveedorResponseDTO:
-      type: object
-      required: [idProveedor, estado, persona]
-      properties:
-        idProveedor:
-          type: integer
-          format: int64
-          example: 5
-        nombreFantasia:
-          type: string
-          example: "Lácteos del Este"
-        estado:
-          type: boolean
-          example: true
-        persona:
-          $ref: '#/components/schemas/PersonaDTO'
-
-    # ---------------------------------------------------------
-    # CLIENTE (Reutiliza PersonaDTO)
-    # ---------------------------------------------------------
-    ClienteRequestDTO:
-      type: object
-      required: [persona]
-      properties:
-        estado:
-          type: boolean
-          default: true
-        persona:
-          $ref: '#/components/schemas/PersonaCreateDTO'
-
-    ClienteResponseDTO:
-      type: object
-      required: [idCliente, estado, persona]
-      properties:
-        idCliente:
-          type: integer
-          format: int64
-          example: 12
-        estado:
-          type: boolean
-          example: true
-        persona:
-          $ref: '#/components/schemas/PersonaDTO'
-
-    # ---------------------------------------------------------
-    # EMPLEADO (Reutiliza PersonaDTO)
-    # ---------------------------------------------------------
-    EmpleadoRequestDTO:
-      type: object
-      required: [cargo, fechaIngreso, persona]
-      properties:
-        cargo:
-          type: string
-          maxLength: 60
-          example: "Cajero Principal"
-        fechaIngreso:
-          type: string
-          format: date
-          example: "2024-02-01"
-        estado:
-          type: boolean
-          default: true
-        persona:
-          $ref: '#/components/schemas/PersonaCreateDTO'
-
-    EmpleadoResponseDTO:
-      type: object
-      required: [idEmpleado, cargo, fechaIngreso, estado, persona]
-      properties:
-        idEmpleado:
-          type: integer
-          format: int64
-          example: 3
-        cargo:
-          type: string
-          example: "Cajero Principal"
-        fechaIngreso:
-          type: string
-          format: date
-          example: "2024-02-01"
-        estado:
-          type: boolean
-          example: true
-        persona:
-          $ref: '#/components/schemas/PersonaDTO'
-
-    # ---------------------------------------------------------
-    # 🌟 REUTILIZACIÓN: COMPROBANTE Y COMPROBANTE DETALLE
-    # (Refleja @MappedSuperclass Comprobante y ComprobanteDetalle)
-    # ---------------------------------------------------------
-    BaseComprobante:
-      type: object
-      required: [numeroFactura, fechaEmision]
-      properties:
-        numeroFactura:
-          type: string
-          maxLength: 50
-          description: Formato fiscal (ej. 001-001-0001234)
-          example: "001-001-0001234"
-        fechaEmision:
-          type: string
-          format: date
-          description: Fecha de emisión del comprobante
-          example: "2026-09-15"
-
-    BaseComprobanteDetalle:
-      type: object
-      required: [idProducto, cantidad, precioUnitario]
-      properties:
-        idProducto:
-          type: integer
-          format: int64
-          example: 101
-        cantidad:
-          type: integer
-          minimum: 1
-          example: 10
-        precioUnitario:
-          type: number
-          minimum: 0
-          example: 5000.00
-        porcentajeIva:
-          type: number
-          enum: [0, 5, 10]
-          default: 10
-          example: 10
-
-    # ---------------------------------------------------------
-    # COMPRAS: FACTURAS (Cabecera y Detalle)
-    # ---------------------------------------------------------
-    FacturaCompraDetalleRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobanteDetalle'
-
-    FacturaCompraRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobante'
-        - type: object
-          required: [idProveedor, idDeposito, idMedioPago, timbrado, detalles]
-          properties:
-            idProveedor:
-              type: integer
-              format: int64
-              example: 5
-            idDeposito:
-              type: integer
-              format: int64
-              description: Depósito receptor del stock
-              example: 1
-            idMedioPago:
-              type: integer
-              format: int64
-              example: 1
-            timbrado:
-              type: string
-              maxLength: 20
-              description: Timbrado impreso de la factura del proveedor
-              example: "15894231"
-            detalles:
-              type: array
-              minItems: 1
-              items:
-                $ref: '#/components/schemas/FacturaCompraDetalleRequestDTO'
-
-    FacturaCompraDetalleResponseDTO:
-      type: object
-      required: [idDetalle, idProducto, nombreProducto, cantidad, precioUnitario, subtotal, montoIva]
-      properties:
-        idDetalle:
-          type: integer
-          format: int64
-          example: 301
-        idProducto:
-          type: integer
-          format: int64
-          example: 101
-        nombreProducto:
-          type: string
-          example: "Leche Entera 1L"
-        codigoBarra:
-          type: string
-          example: "7840001234567"
-        cantidad:
-          type: integer
-          example: 10
-        precioUnitario:
-          type: number
-          example: 5000.00
-        subtotal:
-          type: number
-          example: 50000.00
-        porcentajeIva:
-          type: number
-          example: 10
-        montoIva:
-          type: number
-          description: Monto de IVA liquidado incluido en el subtotal
-          example: 4545.45
-
-    FacturaCompraResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobante'
-        - type: object
-          required: [idFacturaCompra, timbrado, totalIva, totalGeneral, proveedor, deposito, medioPago, detalles]
-          properties:
-            idFacturaCompra:
-              type: integer
-              format: int64
-              example: 45
-            timbrado:
-              type: string
-              example: "15894231"
-            totalIva:
-              type: number
-              example: 9090.91
-            totalGeneral:
-              type: number
-              example: 100000.00
-            proveedor:
-              $ref: '#/components/schemas/ProveedorResponseDTO'
-            deposito:
-              $ref: '#/components/schemas/DepositoDTO'
-            medioPago:
-              $ref: '#/components/schemas/MedioPagoDTO'
-            detalles:
-              type: array
-              items:
-                $ref: '#/components/schemas/FacturaCompraDetalleResponseDTO'
-
-    # ---------------------------------------------------------
-    # VENTAS: FACTURAS (Cabecera y Detalle)
-    # ---------------------------------------------------------
-    FacturaVentaDetalleRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobanteDetalle'
-
-    FacturaVentaRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobante'
-        - type: object
-          required: [idCliente, idEmpleado, idDeposito, idMedioPago, idTimbrado, detalles]
-          properties:
-            idCliente:
-              type: integer
-              format: int64
-              example: 12
-            idEmpleado:
-              type: integer
-              format: int64
-              example: 3
-            idDeposito:
-              type: integer
-              format: int64
-              description: Depósito desde el cual se descarga el stock vendido
-              example: 1
-            idMedioPago:
-              type: integer
-              format: int64
-              example: 1
-            idTimbrado:
-              type: integer
-              format: int64
-              description: Timbrado fiscal propio de la empresa a utilizar
-              example: 2
-            detalles:
-              type: array
-              minItems: 1
-              items:
-                $ref: '#/components/schemas/FacturaVentaDetalleRequestDTO'
-
-    FacturaVentaDetalleResponseDTO:
-      type: object
-      required: [idDetalle, idProducto, nombreProducto, cantidad, precioUnitario, subtotal, montoIva]
-      properties:
-        idDetalle:
-          type: integer
-          format: int64
-          example: 801
-        idProducto:
-          type: integer
-          format: int64
-          example: 101
-        nombreProducto:
-          type: string
-          example: "Leche Entera 1L"
-        cantidad:
-          type: integer
-          example: 2
-        precioUnitario:
-          type: number
-          example: 6000.00
-        subtotal:
-          type: number
-          example: 12000.00
-        porcentajeIva:
-          type: number
-          example: 10
-        montoIva:
-          type: number
-          example: 1090.91
-
-    FacturaVentaResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobante'
-        - type: object
-          required: [idFacturaVenta, estado, totalIva, totalGeneral, cliente, empleado, timbrado, detalles]
-          properties:
-            idFacturaVenta:
-              type: integer
-              format: int64
-              example: 98
-            estado:
-              $ref: '#/components/schemas/EstadoFacturaVenta'
-            totalIva:
-              type: number
-              example: 5454.55
-            totalGeneral:
-              type: number
-              example: 60000.00
-            cliente:
-              $ref: '#/components/schemas/ClienteResponseDTO'
-            empleado:
-              $ref: '#/components/schemas/EmpleadoResponseDTO'
-            deposito:
-              $ref: '#/components/schemas/DepositoDTO'
-            medioPago:
-              $ref: '#/components/schemas/MedioPagoDTO'
-            timbrado:
-              $ref: '#/components/schemas/TimbradoDTO'
-            detalles:
-              type: array
-              items:
-                $ref: '#/components/schemas/FacturaVentaDetalleResponseDTO'
-
-    # ---------------------------------------------------------
-    # TIMBRADOS FISCALES
-    # ---------------------------------------------------------
-    TimbradoCreateDTO:
-      type: object
-      required: [numeroTimbrado, fechaInicio, fechaVencimiento]
-      properties:
-        numeroTimbrado:
-          type: string
-          maxLength: 20
-          example: "16543210"
-        fechaInicio:
-          type: string
-          format: date
-          example: "2026-01-01"
-        fechaVencimiento:
-          type: string
-          format: date
-          example: "2026-12-31"
-        sucursal:
-          type: string
-          maxLength: 3
-          default: "001"
-          example: "001"
-        puntoExpedicion:
-          type: string
-          maxLength: 3
-          default: "001"
-          example: "001"
-        activo:
-          type: boolean
-          default: true
-
-    TimbradoDTO:
-      allOf:
-        - $ref: '#/components/schemas/TimbradoCreateDTO'
-        - type: object
-          required: [idTimbrado]
-          properties:
-            idTimbrado:
-              type: integer
-              format: int64
-              example: 2
-
-    # ---------------------------------------------------------
-    # ADMINISTRACIÓN Y AUXILIARES
-    # ---------------------------------------------------------
-    MedioPagoDTO:
-      type: object
-      required: [idMedioPago, nombre]
-      properties:
-        idMedioPago:
-          type: integer
-          format: int64
-          example: 1
         nombre:
           type: string
-          maxLength: 50
-          example: "Efectivo"
-        activo:
-          type: boolean
-          example: true
-
-    DepositoDTO:
-      type: object
-      required: [idDeposito, nombre]
-      properties:
-        idDeposito:
-          type: integer
-          format: int64
-          example: 1
-        nombre:
-          type: string
-          example: "Depósito Central"
-        ubicacion:
-          type: string
-          example: "Av. Mariscal López 1234"
-        estado:
-          type: boolean
-          example: true
-
-    ConfiguracionDTO:
-      type: object
-      required: [idConfiguracion, clave, valor]
-      properties:
-        idConfiguracion:
-          type: integer
-          format: int64
-          example: 1
-        clave:
-          type: string
-          example: "IVA_DEFECTO"
-        valor:
-          type: string
-          example: "10"
+          maxLength: 80
+          example: "Bebidas"
+          description: "Nombre único de la categoría"
         descripcion:
           type: string
-          example: "Tasa general de IVA aplicada por omisión"
+          maxLength: 200
+          example: "Gaseosas, jugos y bebidas alcohólicas"
+          description: "Descripción detallada de la categoría"
 
-    StockDepositoResponseDTO:
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE CATEGORÍAS (Response)
+    # ---------------------------------------------------------
+    CategoriaResponseDTO:
       type: object
-      required: [idStock, idDeposito, idProducto, cantidad]
+      required: [idCategoria, nombre, descripcion]
       properties:
-        idStock:
+        idCategoria:
           type: integer
           format: int64
           example: 1
-        idDeposito:
-          type: integer
-          format: int64
-          example: 1
-        nombreDeposito:
+          description: "Identificador único de la categoría"
+        nombre:
           type: string
-          example: "Depósito Central"
-        idProducto:
-          type: integer
-          format: int64
-          example: 101
-        nombreProducto:
+          example: "Bebidas"
+        descripcion:
           type: string
-          example: "Leche Entera 1L"
-        cantidad:
-          type: integer
-          example: 150
+          example: "Gaseosas, jugos y bebidas alcohólicas"
 
     # ---------------------------------------------------------
-    # PRODUCTOS DTOs
+    # SCHEMA - SOLICITUD DE MARCAS (Request)
     # ---------------------------------------------------------
-    ProductoCreateDTO:
+    MarcaRequestDTO:
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 80
+          example: "Coca-Cola"
+          description: "Nombre único de la marca"
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE MARCAS (Response)
+    # ---------------------------------------------------------
+    MarcaResponseDTO:
+      type: object
+      required: [idMarca, nombre]
+      properties:
+        idMarca:
+          type: integer
+          format: int64
+          example: 1
+          description: "Identificador único de la marca"
+        nombre:
+          type: string
+          example: "Coca-Cola"
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE PRODUCTOS (Request)
+    # ---------------------------------------------------------
+    ProductoRequestDTO:
       type: object
       required: [nombre, precioCosto, precioVenta, porcentajeIva, stockMinimo, idCategoria, idMarca]
       properties:
@@ -1780,7 +1399,10 @@ components:
           type: boolean
           default: true
 
-    ProductoDetailResponseDTO:
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE PRODUCTOS (Response)
+    # ---------------------------------------------------------
+    ProductoResponseDTO:
       type: object
       required: [idProducto, nombre, precioVenta, stockActual, estado]
       properties:
@@ -1804,69 +1426,9 @@ components:
           type: boolean
           example: true
 
-    # ==========================================
-    # DTOs DE CATEGORÍA
-    # ==========================================
-    CategoriaRequestDTO:
-      type: object
-      required: [nombre]
-      properties:
-        nombre:
-          type: string
-          maxLength: 80
-          example: "Bebidas"
-          description: "Nombre único de la categoría"
-        descripcion:
-          type: string
-          maxLength: 200
-          example: "Gaseosas, jugos y bebidas alcohólicas"
-          description: "Descripción detallada de la categoría"
-
-    CategoriaResponseDTO:
-      type: object
-      required: [idCategoria, nombre, descripcion]
-      properties:
-        idCategoria:
-          type: integer
-          format: int64
-          example: 1
-          description: "Identificador único de la categoría"
-        nombre:
-          type: string
-          example: "Bebidas"
-        descripcion:
-          type: string
-          example: "Gaseosas, jugos y bebidas alcohólicas"
-
-    # ==========================================
-    # DTOs DE MARCA
-    # ==========================================
-    MarcaRequestDTO:
-      type: object
-      required: [nombre]
-      properties:
-        nombre:
-          type: string
-          maxLength: 80
-          example: "Coca-Cola"
-          description: "Nombre único de la marca"
-
-    MarcaResponseDTO:
-      type: object
-      required: [idMarca, nombre]
-      properties:
-        idMarca:
-          type: integer
-          format: int64
-          example: 1
-          description: "Identificador único de la marca"
-        nombre:
-          type: string
-          example: "Coca-Cola"
-
-    # ==========================================
-    # DTOs DE DEPÓSITO
-    # ==========================================
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE DEPÓSITOS (Request)
+    # ---------------------------------------------------------
     DepositoRequestDTO:
       type: object
       required: [nombre]
@@ -1887,6 +1449,9 @@ components:
           example: true
           description: "Estado operativo del depósito (activo/inactivo)"
 
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE DEPÓSITOS (Response)
+    # ---------------------------------------------------------
     DepositoResponseDTO:
       type: object
       required: [idDeposito, nombre, ubicacion, estado]
@@ -1907,19 +1472,344 @@ components:
           example: true
 
     # ---------------------------------------------------------
-    # RESPUESTAS PAGINADAS (Heredan de BasePageResponse)
+    # SCHEMA - SOLICITUD DE STOCK DEPÓSITO (Request)
     # ---------------------------------------------------------
-    ProductoPageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProductoDetailResponseDTO'
+    StockDepositoRequestDTO:
+      type: object
+      required: [idDeposito, idProducto, cantidad]
+      properties:
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+          description: "ID del depósito asociado"
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+          description: "ID del producto asociado"
+        cantidad:
+          type: integer
+          minimum: 0
+          example: 50
+          description: "Cantidad de unidades en stock para el producto en dicho depósito"
 
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE STOCK DEPÓSITO (Response)
+    # ---------------------------------------------------------
+    StockDepositoResponseDTO:
+      type: object
+      required: [idStock, idDeposito, idProducto, cantidad]
+      properties:
+        idStock:
+          type: integer
+          format: int64
+          example: 1
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        nombreDeposito:
+          type: string
+          example: "Depósito Central"
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+        nombreProducto:
+          type: string
+          example: "Coca-Cola 1.5L"
+        cantidad:
+          type: integer
+          example: 50
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE PERSONA (Request)
+    # ---------------------------------------------------------
+    PersonaRequestDTO:
+      type: object
+      required: [tipoPersona, nombreCompleto]
+      properties:
+        tipoPersona:
+          $ref: '#/components/schemas/TipoPersona'
+        ci:
+          type: string
+          maxLength: 20
+          example: "4521369"
+          description: Cédula de Identidad. Obligatorio si tipoPersona es FISICA.
+        ruc:
+          type: string
+          maxLength: 20
+          example: "80012345-6"
+          description: Registro Único de Contribuyente. Obligatorio si tipoPersona es JURIDICA.
+        nombreCompleto:
+          type: string
+          maxLength: 150
+          example: "Juan Carlos Pérez"
+          description: Razón Social (para Jurídica) o Nombres y Apellidos (para Física).
+        telefono:
+          type: string
+          maxLength: 30
+          example: "0981123456"
+        correo:
+          type: string
+          format: email
+          maxLength: 100
+          example: "juan.perez@email.com"
+        direccion:
+          type: string
+          maxLength: 200
+          example: "Av. San Martín 1234, Asunción"
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE PERSONA (Response)
+    # ---------------------------------------------------------
+    PersonaResponseDTO:
+      type: object
+      properties:
+        idPersona:
+          type: integer
+          format: int64
+          example: 1
+        tipoPersona:
+          $ref: '#/components/schemas/TipoPersona'
+        ci:
+          type: string
+          example: "4521369"
+        ruc:
+          type: string
+          example: "80012345-6"
+        nombreCompleto:
+          type: string
+          example: "Juan Carlos Pérez"
+        telefono:
+          type: string
+          example: "0981123456"
+        correo:
+          type: string
+          example: "juan.perez@email.com"
+        direccion:
+          type: string
+          example: "Av. San Martín 1234, Asunción"
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE EMPLEADO (Request)
+    # ---------------------------------------------------------
+    EmpleadoRequestDTO:
+      type: object
+      required: [idPersona, cargo, fechaIngreso, estado]
+      properties:
+        idPersona:
+          type: integer
+          format: int64
+          example: 1
+          description: ID de la Persona (previamente registrada)
+        cargo:
+          type: string
+          maxLength: 60
+          example: "Depositario / Cajero"
+        fechaIngreso:
+          type: string
+          format: date
+          example: "2026-01-15"
+        estado:
+          type: boolean
+          default: true
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE EMPLEADO (Response)
+    # ---------------------------------------------------------
+    EmpleadoResponseDTO:
+      type: object
+      required: [idEmpleado, idPersona, nombreCompletoPersona, ciPersona, cargo, fechaIngreso, estado]
+      properties:
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 10
+        idPersona:
+          type: integer
+          format: int64
+          example: 1
+        nombreCompletoPersona:
+          type: string
+          example: "Juan Carlos Pérez"
+        ciPersona:
+          type: string
+          example: "4521369"
+        cargo:
+          type: string
+          example: "Depositario / Cajero"
+        fechaIngreso:
+          type: string
+          format: date
+          example: "2026-01-15"
+        estado:
+          type: boolean
+          example: true
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE AJUSTES DE STOCK (Request)
+    # ---------------------------------------------------------
+    AjusteStockRequestDTO:
+      type: object
+      required: [idDeposito, idEmpleado, motivo, tipoAjuste, detalles]
+      properties:
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        motivo:
+          type: string
+          maxLength: 200
+          example: "Mercadería dañada en transporte"
+        tipoAjuste:
+          $ref: '#/components/schemas/TipoAjuste'
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AjusteStockDetalleRequestDTO'
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE AJUSTES DE STOCK (Response)
+    # ---------------------------------------------------------
+    AjusteStockResponseDTO:
+      type: object
+      required: [idAjuste, idDeposito, nombreDeposito, idEmpleado, nombreEmpleado, motivo, tipoAjuste, detalles]
+      properties:
+        idAjuste:
+          type: integer
+          format: int64
+          example: 1
+        idDeposito:
+          type: integer
+          format: int64
+          example: 1
+        nombreDeposito:
+          type: string
+          example: "Depósito Central"
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        nombreEmpleado:
+          type: string
+          example: "Carlos Gómez"
+        motivo:
+          type: string
+          example: "Mercadería dañada en transporte"
+        tipoAjuste:
+          $ref: '#/components/schemas/TipoAjuste'
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AjusteStockDetalleResponseDTO'
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE DETALLES DE AJUSTES DE STOCK (Request)
+    # ---------------------------------------------------------
+    AjusteStockDetalleRequestDTO:
+      type: object
+      required: [idAjuste, idProducto, cantidad]
+      properties:
+        idAjuste:
+          type: integer
+          format: int64
+          example: 101
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 15
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE DETALLES DE AJUSTES DE STOCK (Response)
+    # ---------------------------------------------------------
+    AjusteStockDetalleResponseDTO:
+      type: object
+      required: [idAjuste, idProducto, nombreProducto, cantidad]
+      properties:
+        idAjuste:
+          type: integer
+          format: int64
+          example: 101
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+        nombreProducto:
+          type: string
+          example: "Coca-Cola 1.5L"
+        cantidad:
+          type: integer
+          example: 15
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE TRANSFERENCIAS DE STOCK (Request)
+    # ---------------------------------------------------------
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE TRANSFERENCIAS DE STOCK (Response)
+    # ---------------------------------------------------------
+
+    # ---------------------------------------------------------
+    # SCHEMA - CONFIGURACIÓN DTO (Administrativo)
+    # ---------------------------------------------------------
+    ConfiguracionDTO:
+      type: object
+      required: [idConfiguracion, clave, valor]
+      properties:
+        idConfiguracion:
+          type: integer
+          format: int64
+          example: 1
+        clave:
+          type: string
+          example: "IVA_DEFECTO"
+        valor:
+          type: string
+          example: "10"
+        descripcion:
+          type: string
+          example: "Tasa general de IVA aplicada por omisión"
+
+    # ---------------------------------------------------------
+    # SCHEMA - PAGINACIÓN BASE
+    # ---------------------------------------------------------
+    BasePageResponse:
+      type: object
+      required: [pageNumber, pageSize, totalElements, totalPages, isFirst, isLast]
+      properties:
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 85
+        totalPages:
+          type: integer
+          example: 9
+        isFirst:
+          type: boolean
+          example: true
+        isLast:
+          type: boolean
+          example: false
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTAS PAGINADAS (Heredan de BasePageResponse)
+    # ---------------------------------------------------------
     CategoriaPageResponseDTO:
       allOf:
         - $ref: '#/components/schemas/BasePageResponse'
@@ -1935,14 +1825,14 @@ components:
       allOf:
         - $ref: '#/components/schemas/BasePageResponse'
         - type: object
-          required: [ content ]
+          required: [content]
           properties:
             content:
               type: array
               items:
                 $ref: '#/components/schemas/MarcaResponseDTO'
 
-    DepositoPageResponseDTO:
+    ProductoPageResponseDTO:
       allOf:
         - $ref: '#/components/schemas/BasePageResponse'
         - type: object
@@ -1951,62 +1841,18 @@ components:
             content:
               type: array
               items:
+                $ref: '#/components/schemas/ProductoResponseDTO'
+
+    DepositoPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
                 $ref: '#/components/schemas/DepositoResponseDTO'
-
-    FacturaCompraPageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/FacturaCompraResponseDTO'
-
-    FacturaVentaPageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/FacturaVentaResponseDTO'
-
-    ProveedorPageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProveedorResponseDTO'
-
-    ClientePageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/ClienteResponseDTO'
-
-    EmpleadoPageResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/BasePageResponse'
-        - type: object
-          required: [content]
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmpleadoResponseDTO'
 
     StockDepositoPageResponseDTO:
       allOf:
@@ -2018,3 +1864,25 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/StockDepositoResponseDTO'
+
+    PersonaPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [ content ]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+
+    EmpleadoPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmpleadoResponseDTO'
