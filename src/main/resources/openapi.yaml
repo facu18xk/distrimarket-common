@@ -1,11 +1,13 @@
 openapi: 3.0.3
 info:
-  title: DistriMarket API - Módulo Inventarios
+  title: DistriMarket API
   description: Contrato API y DTOs optimizados para Productos, Marcas, Categorías, Depósitos, Ajustes de Stock y Transferencias de Stock.
   version: 1.0.0
 servers:
   - url: http://localhost:8080/api/v1
     description: Servidor Local de Desarrollo
+  - url: http://localhost:8081
+    description: Microservicio Inventario
 
 # =============================================================
 # 1. TAGS GLOBALES
