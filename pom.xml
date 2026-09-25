@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>org.example</groupId>
+    <groupId>com.distrimarket</groupId>
     <artifactId>distrimarket-common</artifactId>
     <version>1.0.0</version>
 
@@ -99,7 +99,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/static/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <modelPackage>com.distrimarket.commons.dto</modelPackage>
                             <generateApis>false</generateApis>

@@ -3,9 +3,10 @@ info:
   title: DistriMarket API
   description: Contrato API y DTOs optimizados para Productos, Marcas, Categorías, Depósitos, Ajustes de Stock y Transferencias de Stock.
   version: 1.0.0
+  contact:
+    name: "Soporte DistriMarket"
+    email: "soporte@distrimarket.com"
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Servidor Local de Desarrollo
   - url: http://localhost:8081
     description: Microservicio Inventario
 
@@ -47,8 +48,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista paginada obtenida con éxito
@@ -60,8 +59,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Categorias]
@@ -84,16 +89,22 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /categorias/{idCategoria}:
+  /categorias/{id}:
     get:
       tags: [Categorias]
       summary: Obtener categoría por ID
       operationId: obtenerCategoriaPorId
       parameters:
-        - name: idCategoria
+        - name: id
           in: path
           required: true
           schema:
@@ -110,15 +121,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     put:
       tags: [Categorias]
       summary: Actualizar una categoría existente
       operationId: updateCategoria
       parameters:
-        - name: idCategoria
+        - name: id
           in: path
           required: true
           schema:
@@ -141,15 +158,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     delete:
       tags: [Categorias]
       summary: Eliminar categoría por ID
       operationId: deleteCategoria
       parameters:
-        - name: idCategoria
+        - name: id
           in: path
           required: true
           schema:
@@ -162,8 +185,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - MARCAS
@@ -176,8 +205,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista paginada obtenida con éxito
@@ -189,8 +216,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Marcas]
@@ -213,16 +246,22 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /marcas/{idMarca}:
+  /marcas/{id}:
     get:
       tags: [Marcas]
       summary: Obtener marca por ID
       operationId: obtenerMarcaPorId
       parameters:
-        - name: idMarca
+        - name: id
           in: path
           required: true
           schema:
@@ -239,15 +278,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     put:
       tags: [Marcas]
       summary: Actualizar una marca existente
       operationId: updateMarca
       parameters:
-        - name: idMarca
+        - name: id
           in: path
           required: true
           schema:
@@ -270,15 +315,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     delete:
       tags: [Marcas]
       summary: Eliminar marca por ID
       operationId: deleteMarca
       parameters:
-        - name: idMarca
+        - name: id
           in: path
           required: true
           schema:
@@ -291,8 +342,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - PRODUCTOS
@@ -305,14 +362,9 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortQuery'
-        - $ref: '#/components/parameters/FilterNombreQuery'
-        - $ref: '#/components/parameters/FilterCategoriaQuery'
-        - $ref: '#/components/parameters/FilterMarcaQuery'
-        - $ref: '#/components/parameters/FilterEstadoQuery'
       responses:
         '200':
-          description: Catálogo paginado
+          description: Página de productos obtenida exitosamente
           content:
             application/json:
               schema:
@@ -321,6 +373,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Productos]
@@ -341,16 +401,24 @@ paths:
                 $ref: '#/components/schemas/ProductoResponseDTO'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /productos/{idProducto}:
+  /productos/{id}:
     get:
       tags: [Productos]
       summary: Detalle de producto por ID
       operationId: obtenerProductoPorId
       parameters:
-        - name: idProducto
+        - name: id
           in: path
           required: true
           schema:
@@ -363,15 +431,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     put:
       tags: [Productos]
       summary: Actualizar un producto existente
       operationId: updateProducto
       parameters:
-        - name: idProducto
+        - name: id
           in: path
           required: true
           schema:
@@ -390,15 +468,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     delete:
       tags: [Productos]
       summary: Eliminar producto por ID
       operationId: deleteProducto
       parameters:
-        - name: idProducto
+        - name: id
           in: path
           required: true
           schema:
@@ -407,8 +495,18 @@ paths:
       responses:
         '204':
           description: Producto eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - DEPÓSITOS
@@ -421,8 +519,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista paginada obtenida con éxito
@@ -434,8 +530,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Depositos]
@@ -458,16 +560,22 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /depositos/{idDeposito}:
+  /depositos/{id}:
     get:
       tags: [Depositos]
       summary: Obtener depósito por ID
       operationId: obtenerDepositoPorId
       parameters:
-        - name: idDeposito
+        - name: id
           in: path
           required: true
           schema:
@@ -484,15 +592,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     put:
       tags: [Depositos]
       summary: Actualizar un depósito existente
       operationId: updateDeposito
       parameters:
-        - name: idDeposito
+        - name: id
           in: path
           required: true
           schema:
@@ -515,15 +629,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     delete:
       tags: [Depositos]
       summary: Eliminar depósito por ID
       operationId: deleteDeposito
       parameters:
-        - name: idDeposito
+        - name: id
           in: path
           required: true
           schema:
@@ -536,8 +656,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - STOCK DEPÓSITOS
@@ -550,8 +676,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista paginada obtenida con éxito
@@ -563,8 +687,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Stocks]
@@ -587,16 +717,22 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /stock-depositos/{idStock}:
+  /stock-depositos/{id}:
     get:
       tags: [Stocks]
       summary: Obtener detalle de stock por ID
       operationId: obtenerStockDepositoPorId
       parameters:
-        - name: idStock
+        - name: id
           in: path
           required: true
           schema:
@@ -613,15 +749,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     put:
       tags: [Stocks]
       summary: Actualizar la cantidad de stock
       operationId: updateStockDeposito
       parameters:
-        - name: idStock
+        - name: id
           in: path
           required: true
           schema:
@@ -644,15 +786,21 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     delete:
       tags: [Stocks]
       summary: Eliminar registro de stock
       operationId: deleteStockDeposito
       parameters:
-        - name: idStock
+        - name: id
           in: path
           required: true
           schema:
@@ -665,8 +813,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - PERSONAS
@@ -679,8 +833,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista de personas obtenida exitosamente
@@ -688,10 +840,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -718,18 +876,20 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /personas/{idPersona}:
+  /personas/{id}:
     get:
       tags: [Personas]
       summary: Obtener persona por ID
       operationId: obtenerPersonaPorId
       parameters:
-        - name: idPersona
+        - name: id
           in: path
           required: true
           description: ID de la persona
@@ -743,12 +903,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -757,7 +921,7 @@ paths:
       summary: Actualizar datos de una persona
       operationId: updatePersona
       parameters:
-        - name: idPersona
+        - name: id
           in: path
           required: true
           description: ID de la persona a actualizar
@@ -795,7 +959,7 @@ paths:
       summary: Eliminar persona
       operationId: deletePersona
       parameters:
-        - name: idPersona
+        - name: id
           in: path
           required: true
           description: ID de la persona a eliminar
@@ -805,12 +969,16 @@ paths:
       responses:
         '204':
           description: Persona eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -825,8 +993,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Lista de empleados obtenida exitosamente
@@ -834,10 +1000,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -871,13 +1043,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /empleados/{idEmpleado}:
+  /empleados/{id}:
     get:
       tags: [Empleados]
       summary: Obtener empleado por ID
       operationId: obtenerEmpleadoPorId
       parameters:
-        - name: idEmpleado
+        - name: id
           in: path
           required: true
           description: ID del empleado
@@ -891,12 +1063,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -905,7 +1081,7 @@ paths:
       summary: Actualizar datos de un empleado
       operationId: updateEmpleado
       parameters:
-        - name: idEmpleado
+        - name: id
           in: path
           required: true
           description: ID del empleado a actualizar
@@ -943,7 +1119,7 @@ paths:
       summary: Eliminar empleado
       operationId: deleteEmpleado
       parameters:
-        - name: idEmpleado
+        - name: id
           in: path
           required: true
           description: ID del empleado a eliminar
@@ -953,12 +1129,16 @@ paths:
       responses:
         '204':
           description: Empleado eliminado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '403':
           $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -973,8 +1153,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
-        - $ref: '#/components/parameters/SortByQuery'
-        - $ref: '#/components/parameters/SortDirQuery'
       responses:
         '200':
           description: Historial de ajustes obtenido con éxito
@@ -991,6 +1169,18 @@ paths:
                     type: integer
                   totalPages:
                     type: integer
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
     post:
       tags: [Ajustes-Stock]
@@ -1013,16 +1203,22 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /ajustes-stock/{idAjuste}:
+  /ajustes-stock/{id}:
     get:
       tags: [Ajustes-Stock]
       summary: Obtener detalle completo de un ajuste de stock por ID
       operationId: obtenerAjusteStockPorId
       parameters:
-        - name: idAjuste
+        - name: id
           in: path
           required: true
           schema:
@@ -1039,8 +1235,14 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # PATHS - TRANSFERENCIAS DE STOCK
@@ -1064,6 +1266,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConfiguracionDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
 # =============================================================
 # 3. COMPONENTS
@@ -1074,8 +1288,8 @@ components:
   # -----------------------------------------------------------
   parameters:
     PageQuery:
-      name: page
       in: query
+      name: page
       description: Número de página (base 0)
       required: false
       schema:
@@ -1084,103 +1298,15 @@ components:
         default: 0
 
     SizeQuery:
-      name: size
       in: query
-      description: Tamaño de página (máximo 100)
+      name: size
+      description: Tamaño de página (por defecto 10, máximo 100)
       required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 10
-
-    SortQuery:
-      name: sort
-      in: query
-      description: Campo y dirección de ordenamiento (ej. fechaEmision,desc)
-      required: false
-      schema:
-        type: string
-        example: "fechaEmision,desc"
-
-    SortByQuery:
-      name: sortBy
-      in: query
-      description: Ordenar por id
-      required: false
-      schema:
-        type: string
-        example: id
-
-    SortDirQuery:
-      name: sortDir
-      in: query
-      description: Ordenar alfabéticamente
-      required: false
-      schema:
-        type: string
-        example: asc
-
-    FilterNombreQuery:
-      name: nombre
-      in: query
-      description: Búsqueda textual parcial
-      required: false
-      schema:
-        type: string
-
-    FilterCategoriaQuery:
-      name: idCategoria
-      in: query
-      schema:
-        type: integer
-        format: int64
-
-    FilterMarcaQuery:
-      name: idMarca
-      in: query
-      schema:
-        type: integer
-        format: int64
-
-    FilterEstadoQuery:
-      name: estado
-      in: query
-      schema:
-        type: boolean
-        default: true
-
-    FilterEmpleadoQuery:
-      name: idEmpleado
-      in: query
-      description: Filtrar ventas por empleado vendedor
-      schema:
-        type: integer
-        format: int64
-
-    FilterDepositoQuery:
-      name: idDeposito
-      in: query
-      description: Filtrar por depósito
-      schema:
-        type: integer
-        format: int64
-
-    FilterFechaDesdeQuery:
-      name: fechaDesde
-      in: query
-      description: Fecha mínima (formato YYYY-MM-DD)
-      schema:
-        type: string
-        format: date
-
-    FilterFechaHastaQuery:
-      name: fechaHasta
-      in: query
-      description: Fecha máxima (formato YYYY-MM-DD)
-      schema:
-        type: string
-        format: date
 
   # -----------------------------------------------------------
   # RESPUESTAS DE ERROR REUTILIZABLES (RFC 7807)
@@ -1317,9 +1443,9 @@ components:
     # ---------------------------------------------------------
     CategoriaResponseDTO:
       type: object
-      required: [idCategoria, nombre, descripcion]
+      required: [id, nombre, descripcion]
       properties:
-        idCategoria:
+        id:
           type: integer
           format: int64
           example: 1
@@ -1349,9 +1475,9 @@ components:
     # ---------------------------------------------------------
     MarcaResponseDTO:
       type: object
-      required: [idMarca, nombre]
+      required: [id, nombre]
       properties:
-        idMarca:
+        id:
           type: integer
           format: int64
           example: 1
@@ -1406,9 +1532,9 @@ components:
     # ---------------------------------------------------------
     ProductoResponseDTO:
       type: object
-      required: [idProducto, nombre, precioVenta, stockActual, estado]
+      required: [id, nombre, precioVenta, stockActual, idCategoria, idMarca, estado]
       properties:
-        idProducto:
+        id:
           type: integer
           format: int64
           example: 101
@@ -1424,6 +1550,14 @@ components:
         stockActual:
           type: integer
           example: 42
+        idCategoria:
+          type: integer
+          format: int64
+          example: 1
+        idMarca:
+          type: integer
+          format: int64
+          example: 1
         estado:
           type: boolean
           example: true
@@ -1456,9 +1590,9 @@ components:
     # ---------------------------------------------------------
     DepositoResponseDTO:
       type: object
-      required: [idDeposito, nombre, ubicacion, estado]
+      required: [id, nombre, ubicacion, estado]
       properties:
-        idDeposito:
+        id:
           type: integer
           format: int64
           example: 1
@@ -1501,9 +1635,9 @@ components:
     # ---------------------------------------------------------
     StockDepositoResponseDTO:
       type: object
-      required: [idStock, idDeposito, idProducto, cantidad]
+      required: [id, idDeposito, idProducto, cantidad]
       properties:
-        idStock:
+        id:
           type: integer
           format: int64
           example: 1
@@ -1569,7 +1703,7 @@ components:
     PersonaResponseDTO:
       type: object
       properties:
-        idPersona:
+        id:
           type: integer
           format: int64
           example: 1
@@ -1623,9 +1757,9 @@ components:
     # ---------------------------------------------------------
     EmpleadoResponseDTO:
       type: object
-      required: [idEmpleado, idPersona, nombreCompletoPersona, ciPersona, cargo, fechaIngreso, estado]
+      required: [id, idPersona, nombreCompletoPersona, ciPersona, cargo, fechaIngreso, estado]
       properties:
-        idEmpleado:
+        id:
           type: integer
           format: int64
           example: 10
@@ -1681,9 +1815,9 @@ components:
     # ---------------------------------------------------------
     AjusteStockResponseDTO:
       type: object
-      required: [idAjuste, idDeposito, nombreDeposito, idEmpleado, nombreEmpleado, motivo, tipoAjuste, detalles]
+      required: [id, idDeposito, nombreDeposito, idEmpleado, nombreEmpleado, motivo, tipoAjuste, detalles]
       properties:
-        idAjuste:
+        id:
           type: integer
           format: int64
           example: 1
