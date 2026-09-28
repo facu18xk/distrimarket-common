@@ -19,7 +19,7 @@ public class Deposito extends BaseEntity {
     @Column(name = "ubicacion", length = 150)
     private String ubicacion;
 
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     @Builder.Default
     private Boolean estado = true;
 }

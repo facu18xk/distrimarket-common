@@ -362,6 +362,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/FilterCategoriaQuery'
+        - $ref: '#/components/parameters/FilterMarcaQuery'
       responses:
         '200':
           description: Página de productos obtenida exitosamente
@@ -1308,6 +1310,24 @@ components:
         maximum: 100
         default: 10
 
+    FilterCategoriaQuery:
+      in: query
+      name: categoriaId
+      description: Filtrar por ID de categoría
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterMarcaQuery:
+      in: query
+      name: marcaId
+      description: Filtrar por ID de marca
+      required: false
+      schema:
+        type: integer
+        format: int64
+
   # -----------------------------------------------------------
   # RESPUESTAS DE ERROR REUTILIZABLES (RFC 7807)
   # -----------------------------------------------------------
@@ -1443,7 +1463,7 @@ components:
     # ---------------------------------------------------------
     CategoriaResponseDTO:
       type: object
-      required: [id, nombre, descripcion]
+      required: [id, nombre]
       properties:
         id:
           type: integer
@@ -1532,7 +1552,7 @@ components:
     # ---------------------------------------------------------
     ProductoResponseDTO:
       type: object
-      required: [id, nombre, precioVenta, stockActual, idCategoria, idMarca, estado]
+      required: [id, nombre, precioVenta, porcentajeIva, idCategoria, idMarca, estado]
       properties:
         id:
           type: integer
@@ -1549,7 +1569,11 @@ components:
           example: 6000.00
         stockActual:
           type: integer
+          default: 0
           example: 42
+        porcentajeIva:
+          type: number
+          example: 10
         idCategoria:
           type: integer
           format: int64
@@ -1590,7 +1614,7 @@ components:
     # ---------------------------------------------------------
     DepositoResponseDTO:
       type: object
-      required: [id, nombre, ubicacion, estado]
+      required: [id, nombre, estado]
       properties:
         id:
           type: integer
@@ -1702,6 +1726,7 @@ components:
     # ---------------------------------------------------------
     PersonaResponseDTO:
       type: object
+      required: [id, tipoPersona, nombreCompleto]
       properties:
         id:
           type: integer

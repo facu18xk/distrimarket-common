@@ -3,6 +3,7 @@ package com.distrimarket.commons.entity;
 import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "personas")
@@ -10,7 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Persona extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
@@ -38,11 +39,18 @@ public class Persona extends BaseEntity {
     // Método para validación interna
     @PrePersist
     @PreUpdate
-    public void validarDocumentos() {
-        if (tipoPersona == TipoPersona.JURIDICA && (ruc == null || ruc.isEmpty())) {
+    public void normalizarYValidar() {
+        if (this.ci != null && this.ci.isBlank()) {
+            this.ci = null;
+        }
+        if (this.ruc != null && this.ruc.isBlank()) {
+            this.ruc = null;
+        }
+
+        if (tipoPersona == TipoPersona.JURIDICA && (ruc == null || ruc.isBlank())) {
             throw new IllegalArgumentException("Una persona jurídica debe tener RUC.");
         }
-        if (tipoPersona == TipoPersona.FISICA && (ci == null || ci.isEmpty())) {
+        if (tipoPersona == TipoPersona.FISICA && (ci == null || ci.isBlank())) {
             throw new IllegalArgumentException("Una persona física debe tener CI.");
         }
     }

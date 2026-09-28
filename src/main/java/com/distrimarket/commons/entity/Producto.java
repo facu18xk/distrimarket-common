@@ -47,7 +47,7 @@ public class Producto extends BaseEntity {
     @Builder.Default
     private Integer stockMinimo = 5;
 
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     @Builder.Default
     private Boolean estado = true;
 }

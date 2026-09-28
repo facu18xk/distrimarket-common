@@ -25,7 +25,7 @@ public class Empleado extends BaseEntity {
     @Column(name = "fecha_ingreso", nullable = false)
     private LocalDate fechaIngreso;
 
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     @Builder.Default
     private Boolean estado = true;
 }
