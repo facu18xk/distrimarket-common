@@ -678,6 +678,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/FilterDepositoQuery'
+        - $ref: '#/components/parameters/FilterProductoQuery'
       responses:
         '200':
           description: Lista paginada obtenida con éxito
@@ -1323,6 +1325,24 @@ components:
       in: query
       name: marcaId
       description: Filtrar por ID de marca
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterDepositoQuery:
+      in: query
+      name: depositoId
+      description: Filtrar por ID de depósito
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterProductoQuery:
+      in: query
+      name: productoId
+      description: Filtrar por ID de producto
       required: false
       schema:
         type: integer
