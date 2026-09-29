@@ -1,8 +1,8 @@
 package com.distrimarket.commons.entity;
 
-import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Empleado extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
