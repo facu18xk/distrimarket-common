@@ -1157,6 +1157,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/FilterDepositoQuery'
+        - $ref: '#/components/parameters/FilterEmpleadoQuery'
       responses:
         '200':
           description: Historial de ajustes obtenido con éxito
@@ -1343,6 +1345,15 @@ components:
       in: query
       name: productoId
       description: Filtrar por ID de producto
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterEmpleadoQuery:
+      in: query
+      name: empleadoId
+      description: Filtrar por ID de empleado
       required: false
       schema:
         type: integer
