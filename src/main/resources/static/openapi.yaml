@@ -1847,7 +1847,7 @@ components:
         motivo:
           type: string
           maxLength: 200
-          example: "Mercadería dañada en transporte"
+          example: "Compra de mercadería"
         tipoAjuste:
           $ref: '#/components/schemas/TipoAjuste'
         detalles:
@@ -1882,7 +1882,7 @@ components:
           example: "Carlos Gómez"
         motivo:
           type: string
-          example: "Mercadería dañada en transporte"
+          example: "Compra de mercadería"
         tipoAjuste:
           $ref: '#/components/schemas/TipoAjuste'
         detalles:
@@ -1895,12 +1895,8 @@ components:
     # ---------------------------------------------------------
     AjusteStockDetalleRequestDTO:
       type: object
-      required: [idAjuste, idProducto, cantidad]
+      required: [idProducto, cantidad]
       properties:
-        idAjuste:
-          type: integer
-          format: int64
-          example: 101
         idProducto:
           type: integer
           format: int64
