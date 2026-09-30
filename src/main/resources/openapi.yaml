@@ -23,6 +23,10 @@ tags:
     description: Registro de facturas de compra a proveedores con incremento automático de existencias.
   - name: Compras-Proveedores
     description: Padrón de proveedores comerciales (con Persona Jurídica o Física asociada).
+  - name: Compras-Ordenes
+    description: Gestión de órdenes de compra emitidas a proveedores.
+  - name: Compras-Proveedores-Productos
+    description: Catálogo y precios de compra acordados entre proveedores y productos.
   - name: Ventas-Facturas
     description: Emisión y anulación de comprobantes de venta con timbrado fiscal y descuento de stock.
   - name: Ventas-Clientes
@@ -316,6 +320,107 @@ paths:
                 $ref: '#/components/schemas/ProveedorResponseDTO'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+
+  # -----------------------------------------------------------
+  # COMPRAS: ÓRDENES DE COMPRA
+  # -----------------------------------------------------------
+  /compras/ordenes:
+    get:
+      summary: Listar órdenes de compra
+      tags: [Compras-Ordenes]
+      operationId: listarOrdenesCompra
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+      responses:
+        '200':
+          description: Listado paginado de órdenes de compra
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraPageResponseDTO'
+
+    post:
+      summary: Crear una nueva orden de compra
+      tags: [Compras-Ordenes]
+      operationId: crearOrdenCompra
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenCompraDTO'
+      responses:
+        '201':
+          description: Orden de compra creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /compras/ordenes/{idOrdenCompra}:
+    get:
+      summary: Consultar orden de compra por ID
+      tags: [Compras-Ordenes]
+      operationId: obtenerOrdenCompraPorId
+      parameters:
+        - name: idOrdenCompra
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Detalle de la orden de compra
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCompraDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # -----------------------------------------------------------
+  # COMPRAS: CATÁLOGO PROVEEDOR-PRODUCTO
+  # -----------------------------------------------------------
+  /compras/proveedores-productos:
+    get:
+      summary: Listar acuerdos de proveedor-producto
+      tags: [Compras-Proveedores-Productos]
+      operationId: listarProveedoresProductos
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+      responses:
+        '200':
+          description: Listado de acuerdos proveedor-producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorProductoPageResponseDTO'
+
+    post:
+      summary: Registrar o actualizar acuerdo de compra de producto con proveedor
+      tags: [Compras-Proveedores-Productos]
+      operationId: crearProveedorProducto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorProductoDTO'
+      responses:
+        '201':
+          description: Acuerdo registrado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorProductoDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
 
   # -----------------------------------------------------------
   # VENTAS: FACTURAS, CLIENTES Y TIMBRADOS
@@ -1433,6 +1538,17 @@ components:
               type: integer
               format: int64
               example: 1
+            idOrdenCompra:
+              type: integer
+              format: int64
+              nullable: true
+              description: ID de la orden de compra asociada (opcional)
+              example: 10
+            condicionCompra:
+              type: string
+              enum: [CONTADO, CREDITO]
+              default: CONTADO
+              example: "CONTADO"
             timbrado:
               type: string
               maxLength: 20
@@ -1483,15 +1599,26 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseComprobante'
         - type: object
-          required: [idFacturaCompra, timbrado, totalIva, totalGeneral, proveedor, deposito, medioPago, detalles]
+          required: [idFacturaCompra, timbrado, totalIva, totalGeneral, estado, condicionCompra, proveedor, deposito, medioPago, detalles]
           properties:
             idFacturaCompra:
               type: integer
               format: int64
               example: 45
+            idOrdenCompra:
+              type: integer
+              format: int64
+              nullable: true
+              example: 10
             timbrado:
               type: string
               example: "15894231"
+            estado:
+              type: string
+              example: "ACTIVA"
+            condicionCompra:
+              type: string
+              example: "CONTADO"
             totalIva:
               type: number
               example: 9090.91
@@ -1508,6 +1635,129 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/FacturaCompraDetalleResponseDTO'
+
+    # ---------------------------------------------------------
+    # COMPRAS: CATÁLOGO PROVEEDOR-PRODUCTO
+    # ---------------------------------------------------------
+    ProveedorProductoDTO:
+      type: object
+      required:
+        - idProveedor
+        - idProducto
+        - precioCostoAcordado
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        idProveedor:
+          type: integer
+          format: int64
+          example: 5
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        precioCostoAcordado:
+          type: number
+          format: double
+          example: 4800.00
+        codigoProveedor:
+          type: string
+          example: "PROV-SKU-123"
+        activo:
+          type: boolean
+          default: true
+          example: true
+
+    ProveedorProductoPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProveedorProductoDTO'
+
+    # ---------------------------------------------------------
+    # COMPRAS: ÓRDENES DE COMPRA
+    # ---------------------------------------------------------
+    OrdenCompraDetalleDTO:
+      type: object
+      required:
+        - idProducto
+        - cantidad
+        - precioUnitario
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        idProducto:
+          type: integer
+          format: int64
+          example: 101
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 50
+        precioUnitario:
+          type: number
+          format: double
+          example: 4800.00
+        subtotal:
+          type: number
+          format: double
+          example: 240000.00
+
+    OrdenCompraDTO:
+      type: object
+      required:
+        - idProveedor
+        - idEmpleado
+        - detalles
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        idProveedor:
+          type: integer
+          format: int64
+          example: 5
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        estado:
+          type: string
+          default: "PENDIENTE"
+          example: "PENDIENTE"
+        observacion:
+          type: string
+          example: "Pedido mensual de reposición"
+        total:
+          type: number
+          format: double
+          example: 240000.00
+        detalles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrdenCompraDetalleDTO'
+
+    OrdenCompraPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenCompraDTO'
 
     # ---------------------------------------------------------
     # VENTAS: FACTURAS (Cabecera y Detalle)

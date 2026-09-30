@@ -25,8 +25,20 @@ public class FacturaCompra extends Comprobante {
     @JoinColumn(name = "id_proveedor", nullable = false)
     private Proveedor proveedor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_orden_compra")
+    private OrdenCompra ordenCompra;
+
     @Column(nullable = false, length = 20)
     private String timbrado;
+
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String estado = "ACTIVA";
+
+    @Column(name = "condicion_compra", nullable = false, length = 20)
+    @Builder.Default
+    private String condicionCompra = "CONTADO";
 
     @OneToMany(mappedBy = "facturaCompra", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
