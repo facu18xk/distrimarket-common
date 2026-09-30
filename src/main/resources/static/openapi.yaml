@@ -1165,16 +1165,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AjusteStockResponseDTO'
-                  totalElements:
-                    type: integer
-                  totalPages:
-                    type: integer
+                $ref: '#/components/schemas/AjusteStockPageResponseDTO'
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '401':
@@ -1253,7 +1244,98 @@ paths:
   # -----------------------------------------------------------
   # PATHS - TRANSFERENCIAS DE STOCK
   # -----------------------------------------------------------
+  /transferencias-stock:
+    get:
+      tags: [Transferencias-Stock]
+      summary: Historial paginado de transferencias de stock
+      operationId: listarTransferenciaStock
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/FilterDepositoOrigenQuery'
+        - $ref: '#/components/parameters/FilterDepositoDestinoQuery'
+        - $ref: '#/components/parameters/FilterEmpleadoQuery'
+      responses:
+        '200':
+          description: Historial de transferencias obtenido con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaStockPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
+    post:
+      tags: [Transferencias-Stock]
+      summary: Procesar y registrar una nueva transferencia de stock
+      operationId: crearTransferenciaStock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferenciaStockRequestDTO'
+      responses:
+        '201':
+          description: Transferencia procesada e inventario actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /transferencias-stock/{id}:
+    get:
+      tags: [Transferencias-Stock]
+      summary: Obtener detalle completo de una transferencia de stock por ID
+      operationId: obtenerTransferenciaStockPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Transferencia encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # -----------------------------------------------------------
   # ADMINISTRACIÓN: CONFIGURACIONES
@@ -1336,6 +1418,24 @@ components:
       in: query
       name: depositoId
       description: Filtrar por ID de depósito
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterDepositoOrigenQuery:
+      in: query
+      name: depositoOrigenId
+      description: Filtrar por ID de depósito de origen
+      required: false
+      schema:
+        type: integer
+        format: int64
+
+    FilterDepositoDestinoQuery:
+      in: query
+      name: depositoDestinoId
+      description: Filtrar por ID de depósito de destino
       required: false
       schema:
         type: integer
@@ -1942,10 +2042,125 @@ components:
     # ---------------------------------------------------------
     # SCHEMA - SOLICITUD DE TRANSFERENCIAS DE STOCK (Request)
     # ---------------------------------------------------------
+    TransferenciaStockRequestDTO:
+      type: object
+      required: [idDepositoOrigen, idDepositoDestino, idEmpleado, detalles]
+      properties:
+        idDepositoOrigen:
+          type: integer
+          format: int64
+          example: 1
+          description: "ID del depósito de donde saldrá la mercadería"
+        idDepositoDestino:
+          type: integer
+          format: int64
+          example: 2
+          description: "ID del depósito donde ingresará la mercadería"
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+          description: "ID del empleado responsable de la transferencia"
+        observacion:
+          type: string
+          maxLength: 255
+          example: "Reabastecimiento de salón de ventas"
+          description: "Nota aclaratoria u observación de la operación"
+        detalles:
+          type: array
+          description: "Listado de productos y cantidades a transferir"
+          items:
+            $ref: '#/components/schemas/TransferenciaStockDetalleRequestDTO'
 
     # ---------------------------------------------------------
     # SCHEMA - RESPUESTA DE TRANSFERENCIAS DE STOCK (Response)
     # ---------------------------------------------------------
+    TransferenciaStockResponseDTO:
+      type: object
+      required: [id, idDepositoOrigen, nombreDepositoOrigen, idDepositoDestino, nombreDepositoDestino, idEmpleado, nombreEmpleado, estado, detalles]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 100
+        idDepositoOrigen:
+          type: integer
+          format: int64
+          example: 1
+        nombreDepositoOrigen:
+          type: string
+          example: "Depósito Central"
+        idDepositoDestino:
+          type: integer
+          format: int64
+          example: 2
+        nombreDepositoDestino:
+          type: string
+          example: "Depósito Sucursal 1"
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 3
+        nombreEmpleado:
+          type: string
+          example: "Juan Carlos Pérez"
+        observacion:
+          type: string
+          nullable: true
+          example: "Reabastecimiento de salón de ventas"
+        estado:
+          type: string
+          example: "COMPLETADO"
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferenciaStockDetalleResponseDTO'
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOLICITUD DE DETALLES DE TRANSFERENCIAS DE STOCK (Request)
+    # ---------------------------------------------------------
+    TransferenciaStockDetalleRequestDTO:
+      type: object
+      required: [idProducto, cantidad]
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+          description: "ID del producto a transferir"
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 20
+          description: "Cantidad de unidades a transferir (debe ser mayor a 0)"
+
+    # ---------------------------------------------------------
+    # SCHEMA - RESPUESTA DE DETALLES DE TRANSFERENCIAS DE STOCK (Response)
+    # ---------------------------------------------------------
+    TransferenciaStockDetalleResponseDTO:
+      type: object
+      required: [id, idTransferencia, idProducto, nombreProducto, cantidad]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 501
+          description: "ID del detalle de la transferencia"
+        idTransferencia:
+          type: integer
+          format: int64
+          example: 100
+          description: "ID de la transferencia de stock asociada"
+        idProducto:
+          type: integer
+          format: int64
+          example: 10
+        nombreProducto:
+          type: string
+          example: "Leche Entera 1L"
+        cantidad:
+          type: integer
+          example: 20
 
     # ---------------------------------------------------------
     # SCHEMA - CONFIGURACIÓN DTO (Administrativo)
@@ -2074,3 +2289,45 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/EmpleadoResponseDTO'
+
+    AjusteStockPageResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AjusteStockResponseDTO'
+        totalElements:
+          type: integer
+          format: int64
+          example: 50
+        totalPages:
+          type: integer
+          example: 5
+        size:
+          type: integer
+          example: 10
+        number:
+          type: integer
+          example: 0
+
+    TransferenciaStockPageResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        totalElements:
+          type: integer
+          format: int64
+          example: 50
+        totalPages:
+          type: integer
+          example: 5
+        size:
+          type: integer
+          example: 10
+        number:
+          type: integer
+          example: 0
