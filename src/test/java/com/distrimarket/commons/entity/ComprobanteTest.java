@@ -12,6 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class ComprobanteTest {
 
     @Test
+    @DisplayName("Comprobantes deben estar activos por defecto y permitir borrado lógico")
+    void comprobanteActivoPorDefectoYSoportaBorradoLogico() {
+        FacturaCompra compra = FacturaCompra.builder().build();
+        FacturaVenta venta = FacturaVenta.builder().build();
+
+        assertTrue(compra.getActivo());
+        assertTrue(venta.getActivo());
+
+        compra.setActivo(false);
+        assertFalse(compra.getActivo());
+    }
+
+    @Test
     @DisplayName("Debe calcular correctamente el IVA dinámico al 10% (equivalente a subtotal / 11)")
     void testIvaDiezPorCiento() {
         FacturaCompraDetalle detalle = FacturaCompraDetalle.builder().build();

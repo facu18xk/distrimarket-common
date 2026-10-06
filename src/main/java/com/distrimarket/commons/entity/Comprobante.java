@@ -1,5 +1,6 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.model.SoftDeletable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public abstract class Comprobante extends BaseEntity {
+public abstract class Comprobante extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito", nullable = false)
@@ -42,7 +47,4 @@ public abstract class Comprobante extends BaseEntity {
     @Builder.Default
     private BigDecimal totalGeneral = BigDecimal.ZERO;
 
-    // Aquí evitamos poner @PrePersist de fecha_emision porque
-    // en Compras, la fecha de emisión la dicta el papel del proveedor, no la fecha actual del sistema.
-    // La BaseEntity ya guarda la fecha en que se registró en el sistema.
 }

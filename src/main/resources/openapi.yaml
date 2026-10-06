@@ -618,6 +618,31 @@ paths:
         '409':
           $ref: '#/components/responses/ConflictResponse'
 
+  /ventas/clientes/{idCliente}:
+    patch:
+      summary: Actualizar parcialmente un cliente
+      tags: [Ventas-Clientes]
+      operationId: actualizarParcialmenteCliente
+      parameters:
+        - $ref: '#/components/parameters/ClienteIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientePatchRequestDTO'
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
   /ventas/timbrados:
     get:
       summary: Listar timbrados fiscales de la empresa
@@ -1481,6 +1506,15 @@ components:
         persona:
           $ref: '#/components/schemas/PersonaDTO'
 
+    ClientePatchRequestDTO:
+      type: object
+      description: Enviar uno o ambos campos para actualizar parcialmente el cliente.
+      properties:
+        estado:
+          type: boolean
+        persona:
+          $ref: '#/components/schemas/PersonaCreateDTO'
+
     # ---------------------------------------------------------
     # EMPLEADO (Reutiliza PersonaDTO)
     # ---------------------------------------------------------
@@ -1651,12 +1685,16 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseComprobante'
         - type: object
-          required: [idFacturaCompra, timbrado, totalIva, totalGeneral, estado, condicionCompra, proveedor, deposito, medioPago, detalles]
+          required: [idFacturaCompra, activo, timbrado, totalIva, totalGeneral, estado, condicionCompra, proveedor, deposito, medioPago, detalles]
           properties:
             idFacturaCompra:
               type: integer
               format: int64
               example: 45
+            activo:
+              type: boolean
+              description: Indica si el comprobante está activo; se reserva para borrado lógico.
+              example: true
             idOrdenCompra:
               type: integer
               format: int64
@@ -1918,12 +1956,16 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseComprobante'
         - type: object
-          required: [idFacturaVenta, estado, totalIva, totalGeneral, cliente, empleado, timbrado, detalles]
+          required: [idFacturaVenta, activo, estado, totalIva, totalGeneral, cliente, empleado, timbrado, detalles]
           properties:
             idFacturaVenta:
               type: integer
               format: int64
               example: 98
+            activo:
+              type: boolean
+              description: Indica si el comprobante está activo; se reserva para borrado lógico.
+              example: true
             estado:
               $ref: '#/components/schemas/EstadoFacturaVenta'
             totalIva:

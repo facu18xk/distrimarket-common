@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 029-add-activo-comprobantes
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: facturas_compras
+            columns:
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: facturas_ventas
+            columns:
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
