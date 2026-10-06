@@ -8,7 +8,7 @@ servers:
     description: Servidor Local de Desarrollo
 
 # =============================================================
-# 1. TAGS GLOBALES (Agrupación formal sin espacios en nombres)
+# 1. TAGS GLOBALES
 # =============================================================
 tags:
   - name: Productos
@@ -504,17 +504,21 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
-  /ventas/facturas/{idFacturaVenta}/anular:
-    post:
-      summary: Anular factura de venta
-      description: Cambia el estado a ANULADA y reincorpora el stock al depósito original.
+    patch:
+      summary: Actualizar estado de factura de venta
       tags: [Ventas-Facturas]
-      operationId: anularFacturaVenta
+      operationId: actualizarEstadoFacturaVenta
       parameters:
         - $ref: '#/components/parameters/FacturaVentaIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaVentaEstadoRequestDTO'
       responses:
         '200':
-          description: Factura anulada y stock devuelto al depósito
+          description: Estado actualizado
           content:
             application/json:
               schema:
@@ -525,6 +529,54 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+
+  /ventas/facturas/{idFacturaVenta}/detalles:
+    get:
+      summary: Listar detalles de una factura de venta
+      tags: [Ventas-Facturas]
+      operationId: listarDetallesFacturaVenta
+      parameters:
+        - $ref: '#/components/parameters/FacturaVentaIdPath'
+        - name: q
+          in: query
+          description: Busca por nombre de producto dentro de la factura.
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+      responses:
+        '200':
+          description: Detalles paginados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaVentaDetallePageResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    post:
+      summary: Agregar detalle a la factura de venta
+      tags: [Ventas-Facturas]
+      operationId: agregarDetalleFacturaVenta
+      parameters:
+        - $ref: '#/components/parameters/FacturaVentaIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaVentaDetalleRequestDTO'
+      responses:
+        '201':
+          description: Detalle agregado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaVentaDetalleResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /ventas/clientes:
     get:
@@ -571,15 +623,17 @@ paths:
       summary: Listar timbrados fiscales de la empresa
       tags: [Ventas-Timbrados]
       operationId: listarTimbrados
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
       responses:
         '200':
-          description: Lista de timbrados autorizados
+          description: Timbrados paginados
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimbradoDTO'
+                $ref: '#/components/schemas/TimbradoPageResponseDTO'
 
     post:
       summary: Registrar nuevo timbrado fiscal
@@ -1274,13 +1328,16 @@ components:
     # ---------------------------------------------------------
     BasePageResponse:
       type: object
-      required: [pageNumber, pageSize, totalElements, totalPages, isFirst, isLast]
+      required: [page, size, totalElements, totalPages]
       properties:
-        pageNumber:
+        page:
           type: integer
+          minimum: 0
+          description: Índice de página comenzando en cero.
           example: 0
-        pageSize:
+        size:
           type: integer
+          minimum: 1
           example: 10
         totalElements:
           type: integer
@@ -1288,13 +1345,8 @@ components:
           example: 85
         totalPages:
           type: integer
+          minimum: 0
           example: 9
-        isFirst:
-          type: boolean
-          example: true
-        isLast:
-          type: boolean
-          example: false
 
     # ---------------------------------------------------------
     # ENUMS
@@ -1763,42 +1815,73 @@ components:
     # VENTAS: FACTURAS (Cabecera y Detalle)
     # ---------------------------------------------------------
     FacturaVentaDetalleRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobanteDetalle'
+      type: object
+      required: [idProducto, cantidad]
+      properties:
+        idProducto:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 101
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 2
 
     FacturaVentaRequestDTO:
-      allOf:
-        - $ref: '#/components/schemas/BaseComprobante'
-        - type: object
-          required: [idCliente, idEmpleado, idDeposito, idMedioPago, idTimbrado, detalles]
-          properties:
-            idCliente:
-              type: integer
-              format: int64
-              example: 12
-            idEmpleado:
-              type: integer
-              format: int64
-              example: 3
-            idDeposito:
-              type: integer
-              format: int64
-              description: Depósito desde el cual se descarga el stock vendido
-              example: 1
-            idMedioPago:
-              type: integer
-              format: int64
-              example: 1
-            idTimbrado:
-              type: integer
-              format: int64
-              description: Timbrado fiscal propio de la empresa a utilizar
-              example: 2
-            detalles:
-              type: array
-              minItems: 1
-              items:
-                $ref: '#/components/schemas/FacturaVentaDetalleRequestDTO'
+      type: object
+      required: [numeroFactura, idCliente, idEmpleado, idDeposito, idMedioPago, idTimbrado, detalles]
+      properties:
+        numeroFactura:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Número fiscal de la factura.
+          example: "001-001-0001234"
+        fechaEmision:
+          type: string
+          format: date
+          description: Si se omite, el servicio asigna la fecha actual.
+          example: "2026-09-15"
+        idCliente:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 12
+        idEmpleado:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 3
+        idDeposito:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Depósito desde el cual se descarga el stock vendido.
+          example: 1
+        idMedioPago:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1
+        idTimbrado:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Timbrado fiscal propio de la empresa a utilizar.
+          example: 2
+        detalles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FacturaVentaDetalleRequestDTO'
+
+    FacturaVentaEstadoRequestDTO:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: '#/components/schemas/EstadoFacturaVenta'
 
     FacturaVentaDetalleResponseDTO:
       type: object
@@ -2159,6 +2242,17 @@ components:
     # ---------------------------------------------------------
     # RESPUESTAS PAGINADAS (Heredan de BasePageResponse)
     # ---------------------------------------------------------
+    TimbradoPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/TimbradoDTO'
+
     ProductoPageResponseDTO:
       allOf:
         - $ref: '#/components/schemas/BasePageResponse'
@@ -2224,6 +2318,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/FacturaVentaResponseDTO'
+
+    FacturaVentaDetallePageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/FacturaVentaDetalleResponseDTO'
 
     ProveedorPageResponseDTO:
       allOf:
