@@ -11,6 +11,10 @@ servers:
     description: API Gateway Centralizado
   - url: http://localhost:8081
     description: Microservicio Inventario Local (Puerto 8081)
+  - url: http://localhost:8082
+    description: Microservicio Ventas Local (Puerto 8082)
+  - url: http://localhost:8083
+    description: Microservicio Compras Local (Puerto 8083)
 
 # =============================================================
 # 1. TAGS GLOBALES
