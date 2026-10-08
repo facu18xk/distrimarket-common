@@ -1,8 +1,11 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.model.SoftDeletable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -12,7 +15,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Producto extends BaseEntity {
+@SQLRestriction("activo = true")
+public class Producto extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
@@ -47,7 +55,7 @@ public class Producto extends BaseEntity {
     @Builder.Default
     private Integer stockMinimo = 5;
 
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     @Builder.Default
     private Boolean estado = true;
 }

@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: 029-add-activo-comprobantes
       author: distrimarket
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - columnExists:
+                tableName: facturas_compras
+                columnName: activo
       changes:
         - addColumn:
             tableName: facturas_compras

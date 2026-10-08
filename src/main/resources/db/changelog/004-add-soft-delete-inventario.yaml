@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 030-add-column-activo-soft-delete
+      author: distrimarket
+      comment: Agrega columna activo para borrado logico en entidades maestras
+      changes:
+        # 1. Categorias
+        - addColumn:
+            tableName: categorias
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # 2. Marcas
+        - addColumn:
+            tableName: marcas
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # 3. Depositos
+        - addColumn:
+            tableName: depositos
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # 4. Productos
+        - addColumn:
+            tableName: productos
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # 5. Personas
+        - addColumn:
+            tableName: personas
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # 6. Empleados
+        - addColumn:
+            tableName: empleados
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false

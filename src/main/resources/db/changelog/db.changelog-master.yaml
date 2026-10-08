@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/002-compras-updates.yaml
   - include:
       file: db/changelog/003-comprobantes-activo.yaml
+  - include:
+      file: db/changelog/004-add-soft-delete-inventario.yaml

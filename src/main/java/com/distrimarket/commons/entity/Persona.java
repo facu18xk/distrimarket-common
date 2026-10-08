@@ -1,9 +1,11 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.model.SoftDeletable;
 import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "personas")
@@ -12,7 +14,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Persona extends BaseEntity {
+@SQLRestriction("activo = true")
+public class Persona extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_persona", nullable = false, length = 20)
@@ -39,11 +46,18 @@ public class Persona extends BaseEntity {
     // Método para validación interna
     @PrePersist
     @PreUpdate
-    public void validarDocumentos() {
-        if (tipoPersona == TipoPersona.JURIDICA && (ruc == null || ruc.isEmpty())) {
+    public void normalizarYValidar() {
+        if (this.ci != null && this.ci.isBlank()) {
+            this.ci = null;
+        }
+        if (this.ruc != null && this.ruc.isBlank()) {
+            this.ruc = null;
+        }
+
+        if (tipoPersona == TipoPersona.JURIDICA && (ruc == null || ruc.isBlank())) {
             throw new IllegalArgumentException("Una persona jurídica debe tener RUC.");
         }
-        if (tipoPersona == TipoPersona.FISICA && (ci == null || ci.isEmpty())) {
+        if (tipoPersona == TipoPersona.FISICA && (ci == null || ci.isBlank())) {
             throw new IllegalArgumentException("Una persona física debe tener CI.");
         }
     }

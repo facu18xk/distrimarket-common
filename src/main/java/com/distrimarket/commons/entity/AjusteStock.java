@@ -4,7 +4,6 @@ import com.distrimarket.commons.enums.TipoAjuste;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 

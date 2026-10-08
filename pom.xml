@@ -29,7 +29,7 @@
         <openapi-generator.version>7.4.0</openapi-generator.version>
 
         <!-- Configuración de OpenAPI Generator -->
-        <openapi.spec.file>${project.basedir}/src/main/resources/openapi.yaml</openapi.spec.file>
+        <openapi.spec.file>${project.basedir}/src/main/resources/static/openapi.yaml</openapi.spec.file>
         <openapi.model.package>com.distrimarket.commons.dto</openapi.model.package>
 
         <!-- Configuración de Liquibase CLI (para ejecución manual con mvn liquibase:*) -->
@@ -80,20 +80,20 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter Web (para BaseController y DTOs REST) -->
+        <!-- 7. Spring Boot Starter Web (para BaseController y DTOs REST) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- 7. Swagger Annotations (para DTOs generados por OpenAPI) -->
+        <!-- 8. Swagger Annotations (para DTOs generados por OpenAPI) -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>${swagger-annotations.version}</version>
         </dependency>
 
-        <!-- 8. Jackson DataBind Nullable (para DTOs generados por OpenAPI) -->
+        <!-- 9. Jackson DataBind Nullable (para DTOs generados por OpenAPI) -->
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
@@ -171,8 +171,10 @@
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>
-                            <schemaMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste</schemaMappings>
-                            <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste</importMappings>
+                            <schemaMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</schemaMappings>
+                            <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</importMappings>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <interfaceOnly>false</interfaceOnly>
