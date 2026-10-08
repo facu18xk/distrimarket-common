@@ -1,16 +1,16 @@
 openapi: 3.0.3
 info:
-  title: DistriMarket API
+  title: DistriMarket API Gateway
   description: Contrato API y DTOs.
   version: 1.0.0
   contact:
     name: "Soporte DistriMarket"
     email: "soporte@distrimarket.com"
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Servidor Local de Desarrollo
+  - url: http://localhost:8080
+    description: API Gateway Centralizado
   - url: http://localhost:8081
-    description: Microservicio Inventario
+    description: Microservicio Inventario Local (Puerto 8081)
 
 # =============================================================
 # 1. TAGS GLOBALES
@@ -607,7 +607,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - CATEGORÍAS
   # -----------------------------------------------------------
-  /categorias:
+  /inventario/categorias:
     get:
       tags: [ Categorias ]
       summary: Obtener lista paginada de categorías
@@ -665,7 +665,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /categorias/{id}:
+  /inventario/categorias/{id}:
     get:
       tags: [ Categorias ]
       summary: Obtener categoría por ID
@@ -764,7 +764,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - MARCAS
   # -----------------------------------------------------------
-  /marcas:
+  /inventario/marcas:
     get:
       tags: [ Marcas ]
       summary: Obtener lista paginada de marcas
@@ -822,7 +822,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /marcas/{id}:
+  /inventario/marcas/{id}:
     get:
       tags: [ Marcas ]
       summary: Obtener marca por ID
@@ -921,7 +921,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - PRODUCTOS
   # -----------------------------------------------------------
-  /productos:
+  /inventario/productos:
     get:
       tags: [ Productos ]
       summary: Listar productos con paginación y filtros
@@ -981,7 +981,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /productos/{id}:
+  /inventario/productos/{id}:
     get:
       tags: [ Productos ]
       summary: Detalle de producto por ID
@@ -1080,7 +1080,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - DEPÓSITOS
   # -----------------------------------------------------------
-  /depositos:
+  /inventario/depositos:
     get:
       tags: [ Depositos ]
       summary: Obtener lista paginada de depósitos
@@ -1138,7 +1138,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /depositos/{id}:
+  /inventario/depositos/{id}:
     get:
       tags: [ Depositos ]
       summary: Obtener depósito por ID
@@ -1237,7 +1237,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - STOCK DEPÓSITOS
   # -----------------------------------------------------------
-  /stock-depositos:
+  /inventario/stock-depositos:
     get:
       tags: [ Stocks ]
       summary: Obtener lista paginada de existencias en depósito
@@ -1297,7 +1297,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /stock-depositos/{id}:
+  /inventario/stock-depositos/{id}:
     get:
       tags: [ Stocks ]
       summary: Obtener detalle de stock por ID
@@ -1396,7 +1396,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - PERSONAS
   # -----------------------------------------------------------
-  /personas:
+  /inventario/personas:
     get:
       tags: [ Personas ]
       summary: Listar todas las personas (Físicas y Jurídicas)
@@ -1454,7 +1454,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /personas/{id}:
+  /inventario/personas/{id}:
     get:
       tags: [ Personas ]
       summary: Obtener persona por ID
@@ -1556,7 +1556,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - EMPLEADOS
   # -----------------------------------------------------------
-  /empleados:
+  /inventario/empleados:
     get:
       tags: [ Empleados ]
       summary: Listar todos los empleados
@@ -1616,7 +1616,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /empleados/{id}:
+  /inventario/empleados/{id}:
     get:
       tags: [ Empleados ]
       summary: Obtener empleado por ID
@@ -1718,7 +1718,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - AJUSTES DE STOCK
   # -----------------------------------------------------------
-  /ajustes-stock:
+  /inventario/ajustes-stock:
     get:
       tags: [ Ajustes-Stock ]
       summary: Historial paginado de ajustes de stock
@@ -1778,7 +1778,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /ajustes-stock/{id}:
+  /inventario/ajustes-stock/{id}:
     get:
       tags: [ Ajustes-Stock ]
       summary: Obtener detalle completo de un ajuste de stock por ID
@@ -1813,7 +1813,7 @@ paths:
   # -----------------------------------------------------------
   # PATHS - TRANSFERENCIAS DE STOCK
   # -----------------------------------------------------------
-  /transferencias-stock:
+  /inventario/transferencias-stock:
     get:
       tags: [ Transferencias-Stock ]
       summary: Historial paginado de transferencias de stock
@@ -1874,7 +1874,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
-  /transferencias-stock/{id}:
+  /inventario/transferencias-stock/{id}:
     get:
       tags: [ Transferencias-Stock ]
       summary: Obtener detalle completo de una transferencia de stock por ID
