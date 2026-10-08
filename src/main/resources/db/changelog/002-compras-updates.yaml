@@ -1,0 +1,189 @@
+databaseChangeLog:
+  - changeSet:
+      id: 025-create-ordenes-compras
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: ordenes_compras
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_ordenes_compras
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_proveedor
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ordenes_compras_proveedor
+                    references: proveedores(id)
+              - column:
+                  name: id_empleado
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ordenes_compras_empleado
+                    references: empleados(id)
+              - column:
+                  name: estado
+                  type: VARCHAR(20)
+                  defaultValue: "PENDIENTE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: observacion
+                  type: VARCHAR(255)
+              - column:
+                  name: total
+                  type: NUMERIC(14, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 026-create-ordenes-compras-detalle
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: ordenes_compras_detalle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_ordenes_compras_detalle
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_orden_compra
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ordenes_compras_det_orden
+                    references: ordenes_compras(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ordenes_compras_det_prod
+                    references: productos(id)
+              - column:
+                  name: cantidad
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: precio_unitario
+                  type: NUMERIC(14, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subtotal
+                  type: NUMERIC(14, 2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 027-alter-facturas-compras
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: facturas_compras
+            columns:
+              - column:
+                  name: id_orden_compra
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_facturas_compras_orden
+                    references: ordenes_compras(id)
+              - column:
+                  name: estado
+                  type: VARCHAR(20)
+                  defaultValue: "ACTIVA"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: condicion_compra
+                  type: VARCHAR(20)
+                  defaultValue: "CONTADO"
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 028-create-proveedores-productos
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: proveedores_productos
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_proveedores_productos
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_proveedor
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_prov_prod_proveedor
+                    references: proveedores(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_prov_prod_producto
+                    references: productos(id)
+              - column:
+                  name: precio_costo_acordado
+                  type: NUMERIC(14, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: codigo_proveedor
+                  type: VARCHAR(60)
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: proveedores_productos
+            columnNames: id_proveedor, id_producto
+            constraintName: uq_proveedor_producto

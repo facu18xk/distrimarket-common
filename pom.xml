@@ -13,13 +13,33 @@
 
     <groupId>com.distrimarket</groupId>
     <artifactId>distrimarket-common</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>distrimarket-common</name>
+    <description>Biblioteca compartida con entidades JPA, DTOs y utilidades para el ecosistema Distrimarket</description>
 
     <properties>
+        <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versiones de dependencias y plugins -->
+        <swagger-annotations.version>2.2.20</swagger-annotations.version>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <openapi-generator.version>7.4.0</openapi-generator.version>
+
+        <!-- Configuración de OpenAPI Generator -->
+        <openapi.spec.file>${project.basedir}/src/main/resources/static/openapi.yaml</openapi.spec.file>
+        <openapi.model.package>com.distrimarket.commons.dto</openapi.model.package>
+
+        <!-- Configuración de Liquibase CLI (para ejecución manual con mvn liquibase:*) -->
+        <liquibase.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</liquibase.changeLogFile>
+        <liquibase.defaultSchemaName>public</liquibase.defaultSchemaName>
+        <liquibase.url>${env.DB_URL}</liquibase.url>
+        <liquibase.username>${env.DB_USER}</liquibase.username>
+        <liquibase.password>${env.DB_PASSWORD}</liquibase.password>
     </properties>
+
     <dependencies>
         <!-- 1. Spring Data JPA (Hibernate incluido) -->
         <dependency>
@@ -47,34 +67,43 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- 5. Spring Boot Starter Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- 5. Validation API -->
+        <!-- 6. Validation API -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- 6. Swagger Annotations (para DTOs generados por OpenAPI) -->
+        <!-- 7. Spring Boot Starter Web (para BaseController y DTOs REST) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 8. Swagger Annotations (para DTOs generados por OpenAPI) -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>2.2.20</version>
+            <version>${swagger-annotations.version}</version>
         </dependency>
 
-        <!-- 7. Jackson DataBind Nullable (para DTOs generados por OpenAPI) -->
+        <!-- 9. Jackson DataBind Nullable (para DTOs generados por OpenAPI) -->
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.6</version>
+            <version>${jackson-databind-nullable.version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
+            <!-- 1. Compilación con soporte de Lombok -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -88,27 +117,64 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <!-- Plugin para generar los DTOs a partir de openapi.yaml -->
+
+            <!-- 2. Registrar código fuente generado por OpenAPI en el build path del IDE y compilador -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-openapi-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 3. Empaquetar JAR de fuentes (-sources.jar) para autocompletado y Javadoc en los microservicios -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 4. Plugin para generar los DTOs a partir de openapi.yaml -->
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.4.0</version>
+                <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/static/openapi.yaml</inputSpec>
+                            <inputSpec>${openapi.spec.file}</inputSpec>
                             <generatorName>spring</generatorName>
-                            <modelPackage>com.distrimarket.commons.dto</modelPackage>
+                            <modelPackage>${openapi.model.package}</modelPackage>
                             <generateApis>false</generateApis>
                             <generateModels>true</generateModels>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>
-                            <schemaMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste</schemaMappings>
-                            <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste</importMappings>
+                            <schemaMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</schemaMappings>
+                            <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</importMappings>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <interfaceOnly>false</interfaceOnly>
@@ -118,17 +184,18 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Plugin de Liquibase para migraciones y gestión de changelogs -->
+
+            <!-- 5. Plugin de Liquibase para migraciones manuales vía Maven CLI -->
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <configuration>
-                    <changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
-                    <url>jdbc:postgresql://${env.DB_HOST:localhost}:${env.DB_PORT:5432}/${env.DB_NAME:pos_db}</url>
-                    <username>${env.DB_USER:postgres}</username>
-                    <password>${env.DB_PASSWORD:postgres}</password>
+                    <changeLogFile>${liquibase.changeLogFile}</changeLogFile>
+                    <url>${liquibase.url}</url>
+                    <username>${liquibase.username}</username>
+                    <password>${liquibase.password}</password>
                     <driver>org.postgresql.Driver</driver>
-                    <defaultSchemaName>public</defaultSchemaName>
+                    <defaultSchemaName>${liquibase.defaultSchemaName}</defaultSchemaName>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -138,7 +205,9 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- NOTA: Se omite intencionalmente 'spring-boot-maven-plugin' para asegurar
+                 que se genere un JAR estándar de librería y no un Fat JAR ejecutable (BOOT-INF). -->
         </plugins>
     </build>
-
 </project>

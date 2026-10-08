@@ -1,9 +1,11 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.model.SoftDeletable;
 import com.distrimarket.commons.enums.TipoPersona;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "personas")
@@ -12,7 +14,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Persona extends BaseEntity {
+@SQLRestriction("activo = true")
+public class Persona extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_persona", nullable = false, length = 20)

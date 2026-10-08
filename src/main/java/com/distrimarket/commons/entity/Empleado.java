@@ -1,8 +1,10 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.model.SoftDeletable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -13,9 +15,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Empleado extends BaseEntity {
+@SQLRestriction("activo = true")
+public class Empleado extends BaseEntity implements SoftDeletable {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
     private Persona persona;
 
