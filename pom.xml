@@ -13,7 +13,7 @@
 
     <groupId>com.distrimarket</groupId>
     <artifactId>distrimarket-common</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>distrimarket-common</name>
     <description>Biblioteca compartida con entidades JPA, DTOs y utilidades para el ecosistema Distrimarket</description>
 
