@@ -302,10 +302,23 @@ paths:
         - $ref: '#/components/parameters/SizeQuery'
       responses:
         '200':
+          description: Lista paginada de categorías obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Categorias]
       summary: Crear una nueva categoría
@@ -318,10 +331,23 @@ paths:
               $ref: '#/components/schemas/CategoriaRequestDTO'
       responses:
         '201':
+          description: Categoría creada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/categorias/{id}:
     parameters:
@@ -332,12 +358,23 @@ paths:
       operationId: obtenerCategoriaPorId
       responses:
         '200':
+          description: Categoría encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Categorias]
       summary: Actualizar una categoría existente
@@ -350,10 +387,23 @@ paths:
               $ref: '#/components/schemas/CategoriaRequestDTO'
       responses:
         '200':
+          description: Categoría actualizada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoriaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Categorias]
       summary: Eliminar categoría por ID
@@ -361,6 +411,18 @@ paths:
       responses:
         '204':
           description: Categoría eliminada con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/marcas:
     get:
@@ -372,10 +434,23 @@ paths:
         - $ref: '#/components/parameters/SizeQuery'
       responses:
         '200':
+          description: Lista paginada de marcas obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Marcas]
       summary: Crear una nueva marca
@@ -388,10 +463,23 @@ paths:
               $ref: '#/components/schemas/MarcaRequestDTO'
       responses:
         '201':
+          description: Marca creada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/marcas/{id}:
     parameters:
@@ -402,10 +490,23 @@ paths:
       operationId: obtenerMarcaPorId
       responses:
         '200':
+          description: Marca encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Marcas]
       summary: Actualizar marca
@@ -418,10 +519,23 @@ paths:
               $ref: '#/components/schemas/MarcaRequestDTO'
       responses:
         '200':
+          description: Marca actualizada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarcaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Marcas]
       summary: Eliminar marca
@@ -429,6 +543,18 @@ paths:
       responses:
         '204':
           description: Marca eliminada con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/productos:
     get:
@@ -442,10 +568,23 @@ paths:
         - $ref: '#/components/parameters/FilterMarcaQuery'
       responses:
         '200':
+          description: Lista paginada de productos obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Productos]
       summary: Crear nuevo producto
@@ -458,10 +597,23 @@ paths:
               $ref: '#/components/schemas/ProductoRequestDTO'
       responses:
         '201':
+          description: Producto creado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/productos/{id}:
     parameters:
@@ -472,10 +624,23 @@ paths:
       operationId: obtenerProductoPorId
       responses:
         '200':
+          description: Producto encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Productos]
       summary: Actualizar producto existente
@@ -488,10 +653,23 @@ paths:
               $ref: '#/components/schemas/ProductoRequestDTO'
       responses:
         '200':
+          description: Producto actualizado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Productos]
       summary: Eliminar producto
@@ -499,6 +677,18 @@ paths:
       responses:
         '204':
           description: Producto eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/depositos:
     get:
@@ -510,10 +700,23 @@ paths:
         - $ref: '#/components/parameters/SizeQuery'
       responses:
         '200':
+          description: Lista paginada de depósitos obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Depositos]
       summary: Crear depósito
@@ -526,10 +729,23 @@ paths:
               $ref: '#/components/schemas/DepositoRequestDTO'
       responses:
         '201':
+          description: Depósito creado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/depositos/{id}:
     parameters:
@@ -540,10 +756,23 @@ paths:
       operationId: obtenerDepositoPorId
       responses:
         '200':
+          description: Depósito encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Depositos]
       summary: Actualizar depósito
@@ -556,10 +785,23 @@ paths:
               $ref: '#/components/schemas/DepositoRequestDTO'
       responses:
         '200':
+          description: Depósito actualizado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Depositos]
       summary: Eliminar depósito
@@ -567,6 +809,18 @@ paths:
       responses:
         '204':
           description: Depósito eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/stock-depositos:
     get:
@@ -580,10 +834,23 @@ paths:
         - $ref: '#/components/parameters/FilterProductoQuery'
       responses:
         '200':
+          description: Lista paginada de stocks obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockDepositoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Stocks]
       summary: Inicializar o asignar stock
@@ -596,10 +863,23 @@ paths:
               $ref: '#/components/schemas/StockDepositoRequestDTO'
       responses:
         '201':
+          description: Stock creado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/stock-depositos/{id}:
     parameters:
@@ -610,10 +890,23 @@ paths:
       operationId: obtenerStockDepositoPorId
       responses:
         '200':
+          description: Stock encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Stocks]
       summary: Actualizar cantidad de stock
@@ -626,17 +919,42 @@ paths:
               $ref: '#/components/schemas/StockDepositoRequestDTO'
       responses:
         '200':
+          description: Stock actualizado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockDepositoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Stocks]
       summary: Eliminar registro de stock
       operationId: deleteStockDeposito
       responses:
         '204':
-          description: Registro de stock eliminado
+          description: Stock eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/personas:
     get:
@@ -648,10 +966,23 @@ paths:
         - $ref: '#/components/parameters/SizeQuery'
       responses:
         '200':
+          description: Lista paginada de personas obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Personas]
       summary: Crear persona
@@ -664,10 +995,23 @@ paths:
               $ref: '#/components/schemas/PersonaRequestDTO'
       responses:
         '201':
+          description: Persona creada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/personas/{id}:
     parameters:
@@ -678,10 +1022,23 @@ paths:
       operationId: obtenerPersonaPorId
       responses:
         '200':
+          description: Persona encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Personas]
       summary: Actualizar datos de persona
@@ -694,10 +1051,23 @@ paths:
               $ref: '#/components/schemas/PersonaRequestDTO'
       responses:
         '200':
+          description: Persona actualizada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Personas]
       summary: Eliminar persona
@@ -705,6 +1075,18 @@ paths:
       responses:
         '204':
           description: Persona eliminada con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/empleados:
     get:
@@ -718,10 +1100,23 @@ paths:
         - $ref: '#/components/parameters/FilterEstadoQuery'
       responses:
         '200':
+          description: Lista paginada de empleados obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Empleados]
       summary: Registrar empleado
@@ -734,10 +1129,23 @@ paths:
               $ref: '#/components/schemas/EmpleadoRequestDTO'
       responses:
         '201':
+          description: Empleado creado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/empleados/{id}:
     parameters:
@@ -748,10 +1156,23 @@ paths:
       operationId: obtenerEmpleadoPorId
       responses:
         '200':
+          description: Empleado encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     put:
       tags: [Empleados]
       summary: Actualizar empleado
@@ -764,10 +1185,23 @@ paths:
               $ref: '#/components/schemas/EmpleadoRequestDTO'
       responses:
         '200':
+          description: Empleado actualizado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmpleadoResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags: [Empleados]
       summary: Eliminar empleado
@@ -775,6 +1209,18 @@ paths:
       responses:
         '204':
           description: Empleado eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/ajustes-stock:
     get:
@@ -788,10 +1234,23 @@ paths:
         - $ref: '#/components/parameters/FilterEmpleadoQuery'
       responses:
         '200':
+          description: Lista paginada de ajustes de stock obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AjusteStockPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Ajustes-Stock]
       summary: Registrar y procesar ajuste de stock
@@ -804,10 +1263,23 @@ paths:
               $ref: '#/components/schemas/AjusteStockRequestDTO'
       responses:
         '201':
+          description: Ajuste de stock creado con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AjusteStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/ajustes-stock/{id}:
     parameters:
@@ -818,10 +1290,23 @@ paths:
       operationId: obtenerAjusteStockPorId
       responses:
         '200':
+          description: Ajuste de stock encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AjusteStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/transferencias-stock:
     get:
@@ -836,10 +1321,23 @@ paths:
         - $ref: '#/components/parameters/FilterEmpleadoQuery'
       responses:
         '200':
+          description: Lista paginada de transferencias de stock obtenida con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferenciaStockPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags: [Transferencias-Stock]
       summary: Procesar y registrar transferencia de stock
@@ -852,10 +1350,23 @@ paths:
               $ref: '#/components/schemas/TransferenciaStockRequestDTO'
       responses:
         '201':
+          description: Transferencia de stock creada con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/transferencias-stock/{id}:
     parameters:
@@ -866,10 +1377,23 @@ paths:
       operationId: obtenerTransferenciaStockPorId
       responses:
         '200':
+          description: Transferencia de stock encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   # ===========================================================
   # BLOQUE 3: VENTA
@@ -1492,22 +2016,39 @@ components:
         format: int64
 
   responses:
+    # ---------------------------------------------------------
+    # SCHEMAS DE RESPUESTA DE ERRORES
+    # ---------------------------------------------------------
     BadRequestResponse:
-      description: 400 Bad Request
+      description: 400 Bad Request - Formato o validaciones de campo incorrectos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponseDTO'
+
+    UnauthorizedResponse:
+      description: 401 Unauthorized - Token no proporcionado o expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponseDTO'
+
+    ForbiddenResponse:
+      description: 403 Forbidden - No cuenta con roles ni permisos suficientes
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponseDTO'
 
     NotFoundResponse:
-      description: 404 Not Found
+      description: 404 Not Found  - El recurso solicitado no existe
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponseDTO'
 
     ConflictResponse:
-      description: 409 Conflict
+      description: 409 Conflict - Clave duplicada o estado contradictorio
       content:
         application/json:
           schema:
@@ -1515,6 +2056,13 @@ components:
 
     UnprocessableEntityResponse:
       description: 422 Unprocessable Entity - Regla de negocio rota
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponseDTO'
+
+    InternalServerErrorResponse:
+      description: 500 Internal Server Error - Error inesperado del servidor
       content:
         application/json:
           schema:
@@ -1863,8 +2411,14 @@ components:
       properties:
         nombre:
           type: string
+          maxLength: 80
+          example: "Bebidas"
+          description: "Nombre único de la categoría"
         descripcion:
           type: string
+          maxLength: 200
+          example: "Gaseosas, jugos y bebidas alcohólicas"
+          description: "Descripción detallada de la categoría"
 
     CategoriaResponseDTO:
       type: object
@@ -1873,10 +2427,14 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
+          description: "Identificador único de la categoría"
         nombre:
           type: string
+          example: "Bebidas"
         descripcion:
           type: string
+          example: "Gaseosas, jugos y bebidas alcohólicas"
 
     MarcaRequestDTO:
       type: object
@@ -1884,6 +2442,9 @@ components:
       properties:
         nombre:
           type: string
+          maxLength: 80
+          example: "Coca-Cola"
+          description: "Nombre único de la marca"
 
     MarcaResponseDTO:
       type: object
@@ -1892,8 +2453,11 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
+          description: "Identificador único de la marca"
         nombre:
           type: string
+          example: "Coca-Cola"
 
     ProductoRequestDTO:
       type: object
@@ -1901,24 +2465,34 @@ components:
       properties:
         codigoBarra:
           type: string
+          example: "7840001234567"
         nombre:
           type: string
+          example: "Leche Entera 1L"
         descripcion:
           type: string
+          example: "Leche ultra pasteurizada cartón 1 litro"
         precioCosto:
           type: number
+          example: 4500.00
         precioVenta:
           type: number
+          example: 6000.00
         porcentajeIva:
           type: number
+          enum: [0, 5, 10]
+          example: 10
         stockMinimo:
           type: integer
+          example: 10
         idCategoria:
           type: integer
           format: int64
+          example: 1
         idMarca:
           type: integer
           format: int64
+          example: 1
         estado:
           type: boolean
           default: true
@@ -1930,24 +2504,34 @@ components:
         id:
           type: integer
           format: int64
+          example: 101
         codigoBarra:
           type: string
+          example: "7840001234567"
         nombre:
           type: string
+          example: "Leche Entera 1L"
         precioVenta:
           type: number
+          example: 6000.00
         stockActual:
           type: integer
+          default: 0
+          example: 42
         porcentajeIva:
           type: number
+          example: 10
         idCategoria:
           type: integer
           format: int64
+          example: 1
         idMarca:
           type: integer
           format: int64
+          example: 1
         estado:
           type: boolean
+          example: true
 
     DepositoRequestDTO:
       type: object
@@ -1955,11 +2539,19 @@ components:
       properties:
         nombre:
           type: string
+          maxLength: 80
+          example: "Depósito Central"
+          description: "Nombre único del depósito"
         ubicacion:
           type: string
+          maxLength: 150
+          example: "Av. Principal 123, Bodega A"
+          description: "Dirección o ubicación física del depósito"
         estado:
           type: boolean
           default: true
+          example: true
+          description: "Estado operativo del depósito (activo/inactivo)"
 
     DepositoResponseDTO:
       type: object
@@ -1968,12 +2560,17 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
+          description: "Identificador único del depósito"
         nombre:
           type: string
+          example: "Depósito Central"
         ubicacion:
           type: string
+          example: "Av. Principal 123, Bodega A"
         estado:
           type: boolean
+          example: true
 
     StockDepositoRequestDTO:
       type: object
@@ -1982,12 +2579,18 @@ components:
         idDeposito:
           type: integer
           format: int64
+          example: 1
+          description: "ID del depósito asociado"
         idProducto:
           type: integer
           format: int64
+          example: 10
+          description: "ID del producto asociado"
         cantidad:
           type: integer
           minimum: 0
+          example: 50
+          description: "Cantidad de unidades en stock para el producto en dicho depósito"
 
     StockDepositoResponseDTO:
       type: object
@@ -1996,18 +2599,24 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
         idDeposito:
           type: integer
           format: int64
+          example: 1
         nombreDeposito:
           type: string
+          example: "Depósito Central"
         idProducto:
           type: integer
           format: int64
+          example: 10
         nombreProducto:
           type: string
+          example: "Coca-Cola 1.5L"
         cantidad:
           type: integer
+          example: 50
 
     EmpleadoRequestDTO:
       type: object
@@ -2015,9 +2624,12 @@ components:
       properties:
         cargo:
           type: string
+          maxLength: 60
+          example: "Depositario / Cajero"
         fechaIngreso:
           type: string
           format: date
+          example: "2024-02-01"
         estado:
           type: boolean
           default: true
@@ -2031,13 +2643,17 @@ components:
         id:
           type: integer
           format: int64
+          example: 3
         cargo:
           type: string
+          example: "Depositario / Cajero"
         fechaIngreso:
           type: string
           format: date
+          example: "2024-02-01"
         estado:
           type: boolean
+          example: true
         persona:
           $ref: '#/components/schemas/PersonaResponseDTO'
 
@@ -2048,9 +2664,11 @@ components:
         idProducto:
           type: integer
           format: int64
+          example: 10
         cantidad:
           type: integer
           minimum: 1
+          example: 15
 
     AjusteStockDetalleResponseDTO:
       type: object
@@ -2059,13 +2677,17 @@ components:
         idAjuste:
           type: integer
           format: int64
+          example: 101
         idProducto:
           type: integer
           format: int64
+          example: 10
         nombreProducto:
           type: string
+          example: "Coca-Cola 1.5L"
         cantidad:
           type: integer
+          example: 15
 
     AjusteStockRequestDTO:
       type: object
@@ -2074,11 +2696,15 @@ components:
         idDeposito:
           type: integer
           format: int64
+          example: 1
         idEmpleado:
           type: integer
           format: int64
+          example: 3
         motivo:
           type: string
+          maxLength: 200
+          example: "Compra de mercadería"
         tipoAjuste:
           $ref: '#/components/schemas/TipoAjuste'
         detalles:
@@ -2093,18 +2719,24 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
         idDeposito:
           type: integer
           format: int64
+          example: 1
         nombreDeposito:
           type: string
+          example: "Depósito Central"
         idEmpleado:
           type: integer
           format: int64
+          example: 3
         nombreEmpleado:
           type: string
+          example: "Carlos Gómez"
         motivo:
           type: string
+          example: "Compra de mercadería"
         tipoAjuste:
           $ref: '#/components/schemas/TipoAjuste'
         detalles:
@@ -2119,9 +2751,13 @@ components:
         idProducto:
           type: integer
           format: int64
+          example: 10
+          description: "ID del producto a transferir"
         cantidad:
           type: integer
           minimum: 1
+          example: 20
+          description: "Cantidad de unidades a transferir (debe ser mayor a 0)"
 
     TransferenciaStockDetalleResponseDTO:
       type: object
@@ -2130,16 +2766,23 @@ components:
         id:
           type: integer
           format: int64
+          example: 501
+          description: "ID del detalle de la transferencia"
         idTransferencia:
           type: integer
           format: int64
+          example: 100
+          description: "ID de la transferencia de stock asociada"
         idProducto:
           type: integer
           format: int64
+          example: 10
         nombreProducto:
           type: string
+          example: "Leche Entera 1L"
         cantidad:
           type: integer
+          example: 20
 
     TransferenciaStockRequestDTO:
       type: object
@@ -2148,16 +2791,26 @@ components:
         idDepositoOrigen:
           type: integer
           format: int64
+          example: 1
+          description: "ID del depósito de donde saldrá la mercadería"
         idDepositoDestino:
           type: integer
           format: int64
+          example: 2
+          description: "ID del depósito donde ingresará la mercadería"
         idEmpleado:
           type: integer
           format: int64
+          example: 3
+          description: "ID del empleado responsable de la transferencia"
         observacion:
           type: string
+          maxLength: 255
+          example: "Reabastecimiento de salón de ventas"
+          description: "Nota aclaratoria u observación de la operación"
         detalles:
           type: array
+          description: "Listado de productos y cantidades a transferir"
           items:
             $ref: '#/components/schemas/TransferenciaStockDetalleRequestDTO'
 
@@ -2168,26 +2821,35 @@ components:
         id:
           type: integer
           format: int64
+          example: 100
         idDepositoOrigen:
           type: integer
           format: int64
+          example: 1
         nombreDepositoOrigen:
           type: string
+          example: "Depósito Central"
         idDepositoDestino:
           type: integer
           format: int64
+          example: 2
         nombreDepositoDestino:
           type: string
+          example: "Depósito Sucursal 1"
         idEmpleado:
           type: integer
           format: int64
+          example: 3
         nombreEmpleado:
           type: string
+          example: "Juan Carlos Pérez"
         observacion:
           type: string
           nullable: true
+          example: "Reabastecimiento de salón de ventas"
         estado:
           type: string
+          example: "COMPLETADO"
         detalles:
           type: array
           items:
