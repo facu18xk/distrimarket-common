@@ -2550,11 +2550,10 @@ components:
     SortQuery:
       name: sort
       in: query
-      description: Campo y dirección de ordenamiento (ej. fechaEmision,desc)
+      description: Campo válido del recurso y dirección de ordenamiento (campo,asc o campo,desc). Omitir para usar el orden predeterminado del servicio.
       required: false
       schema:
         type: string
-        example: "fechaEmision,desc"
 
     SortByQuery:
       name: sortBy
