@@ -176,6 +176,7 @@
                             <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
                                 TipoPersona=com.distrimarket.commons.enums.TipoPersona</importMappings>
                             <configOptions>
+                                <serializableModel>true</serializableModel>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <interfaceOnly>false</interfaceOnly>
                                 <openApiNullable>false</openApiNullable>
