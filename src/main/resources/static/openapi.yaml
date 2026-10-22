@@ -1133,6 +1133,60 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
+  /inventario/personas/ci/{ci}:
+    parameters:
+      - $ref: '#/components/parameters/CiPath'
+    get:
+      tags: [ Personas ]
+      summary: Obtener persona por CI
+      operationId: obtenerPersonaPorCi
+      responses:
+        '200':
+          description: Persona encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /inventario/personas/ruc/{ruc}:
+    parameters:
+      - $ref: '#/components/parameters/RucPath'
+    get:
+      tags: [ Personas ]
+      summary: Obtener persona por RUC
+      operationId: obtenerPersonaPorRuc
+      responses:
+        '200':
+          description: Persona encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonaResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
   /inventario/empleados:
     get:
       tags: [Empleados]
@@ -2108,6 +2162,24 @@ components:
         type: integer
         format: int64
         minimum: 1
+
+    CiPath:
+      name: ci
+      in: path
+      required: true
+      description: Número de CI de la persona
+      schema:
+        type: string
+        maxLength: 20
+
+    RucPath:
+      name: ruc
+      in: path
+      required: true
+      description: Número de RUC de la persona
+      schema:
+        type: string
+        maxLength: 20
 
     QueryText:
       name: q
