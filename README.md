@@ -55,7 +55,7 @@ server and no startup order requirement: the gateway uses static routes.
 | --- | --- | --- |
 | distrimarket-ms-featureB | `java -jar target/distrimarket-inventario-1.0.0.jar` | 8081 |
 | distrimarket-ms-featureC | `java -jar target/distrimarket-ms-featureC-0.0.1-SNAPSHOT.jar` | 8082 |
-| distrimarket-ms-featureA | `java -jar target/distrimarket-ms-featureA-1.0-SNAPSHOT.jar` | 8083 |
+| distrimarket-ms-featureA | `java -jar target/distrimarket-compras-1.0-SNAPSHOT.jar` | 8083 |
 | distrimarket-ms-auth | `java -jar target/distrimarket-auth-0.0.1.jar` | 8084 |
 | distrimarket-gateway | `java -jar target/distrimarket-gateway-1.0.0-SNAPSHOT.jar` | 8080 |
 
