@@ -83,6 +83,20 @@ health/info, and `/error` stay public so the gateway Swagger UI keeps working.
 The shared implementation lives in `com.distrimarket.commons.security` and is
 enabled per service with `security.enabled: true`.
 
+## Caché (Compras)
+
+Compras cachea en Redis, por ID, proveedores (30m), facturas de compra (10m) y
+órdenes de compra (10m). Las claves usan `distrimarket:compras:<dominio>:<id>`.
+Los listados no se cachean completos: se guarda cada elemento por su ID.
+
+```sh
+docker compose -f infra/docker-compose.yml up -d   # Redis
+```
+
+`CACHE_ENABLED=false` desactiva la caché sin afectar las lecturas (la verificación
+de integración lo usa para no depender de Redis). Si Redis no responde, Compras
+sigue funcionando contra la base y registra el fallo en el log.
+
 ## Gateway APIs
 
 Open <http://localhost:8080/swagger-ui.html>. The combined contract includes every
