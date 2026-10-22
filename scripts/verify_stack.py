@@ -102,6 +102,10 @@ class Stack:
                     "SPRING_DATASOURCE_URL": f"jdbc:postgresql://127.0.0.1:{self.ports['postgres']}/postgres?sslmode=disable&prepareThreshold=0",
                     "DB_USER": "postgres", "DB_PASSWORD": "", "LIQUIBASE_ENABLED": "true",
                     "CACHE_ENABLED": "false", "SPRING_JPA_SHOW_SQL": "false",
+                    "JWT_SECRET": "distrimarket-dev-secret-cambiar-en-produccion-2026",
+                    "JWT_ISSUER": "distrimarket-auth",
+                    "AUTH_BOOTSTRAP_ADMIN": "true", "AUTH_ADMIN_USERNAME": "admin",
+                    "AUTH_ADMIN_PASSWORD": "Admin123!",
                     "COMPRAS_URL": f"http://127.0.0.1:{self.ports['compras']}",
                     "INVENTARIO_URL": f"http://127.0.0.1:{self.ports['inventario']}",
                     "VENTAS_URL": f"http://127.0.0.1:{self.ports['ventas']}",
@@ -146,10 +150,22 @@ class Stack:
             subprocess.run(["pg_ctl", "-D", str(self.pgdata), "-m", "fast", "-w", "stop"], check=True, stdout=subprocess.DEVNULL)
 
 
+def login_token(gateway, username, password):
+    return http(gateway + "/auth/login", method="POST",
+                body={"username": username, "password": password})
+
+
 def verify(stack):
     gateway = f"http://127.0.0.1:{stack.ports['gateway']}"
+    token = login_token(gateway, "admin", "Admin123!")["accessToken"]
+
     def api(path, **kwargs):
-        return http(gateway + path, **kwargs)
+        headers = {"Authorization": "Bearer " + token}
+        headers.update(kwargs.pop("headers", {}))
+        return http(gateway + path, headers=headers, **kwargs)
+
+    # Compras is protected; the rest are still open in this iteration.
+    http(gateway + "/compras/facturas", expected=401)
     routes = {
         "inventario": ["categorias", "marcas", "productos", "depositos", "stock-depositos", "personas", "empleados", "ajustes-stock", "transferencias-stock"],
         "compras": ["facturas", "proveedores", "ordenes", "proveedores-productos"],
@@ -188,6 +204,11 @@ def verify(stack):
     deposito = create("/inventario/depositos", {"nombre": "Integration", "ubicacion": "Local", "estado": True})
     empleado = create("/inventario/empleados", {"cargo": "Cajero", "fechaIngreso": "2026-01-01", "estado": True, "persona": person})
     require(empleado["persona"]["id"] > 0, "Inventario must retain nested persona.id")
+    create("/auth/usuarios", {"username": "vendedor_test", "password": "Vendedor123!",
+                              "idEmpleado": empleado["id"], "roles": ["VENDEDOR"]})
+    vendedor = login_token(gateway, "vendedor_test", "Vendedor123!")
+    vendedor_headers = {"Authorization": "Bearer " + vendedor["accessToken"]}
+    http(gateway + "/compras/facturas", headers=vendedor_headers, expected=403)
     producto = create("/inventario/productos", {"idCategoria": categoria["id"], "idMarca": marca["id"], "codigoBarra": "INTEGRATION-SKU",
                                                "nombre": "Integration Product", "precioCosto": 50, "precioVenta": 100, "porcentajeIva": 10, "stockMinimo": 1, "estado": True})
     medio = create("/ventas/medios-pago", {"nombre": "Integration Cash"})
@@ -241,7 +262,10 @@ def main():
         for name in APPLICATIONS:
             stack.start_service(name)
         gateway = f"http://127.0.0.1:{stack.ports['gateway']}"
-        require(eventually(lambda: http(gateway + stock_path))["cantidad"] == 10, "Restart must preserve stock")
+        token = login_token(gateway, "admin", "Admin123!")["accessToken"]
+        require(eventually(lambda: http(gateway + stock_path,
+                                        headers={"Authorization": "Bearer " + token}))["cantidad"] == 10,
+                "Restart must preserve stock")
         require(stack.sql("SELECT string_agg(id || ':' || md5sum, ',' ORDER BY orderexecuted) FROM databasechangelog") == migrations, "Restart must not change migration history")
         print("Restart and Liquibase history passed. Full integration verification succeeded.", flush=True)
     finally:

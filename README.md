@@ -63,6 +63,26 @@ Application ports can be overridden with `SERVER_PORT`; the gateway and
 microservices also accept `PORT`. The gateway route targets can be overridden with
 `COMPRAS_URL`, `INVENTARIO_URL`, `VENTAS_URL`, and `AUTH_URL`.
 
+## Security
+
+Auth issues HS256 tokens from `POST /auth/login`. The same `JWT_SECRET` and
+`JWT_ISSUER` must be configured in Auth and in every service that validates
+tokens. `JWT_SECRET` must be at least 32 characters.
+
+Compras is the first service enforcing tokens:
+
+| Service | Allowed roles |
+| --- | --- |
+| Compras | `ADMIN`, `COMPRADOR` |
+| Inventario | currently open (next step) |
+| Ventas | currently open (next step) |
+| Auth `/usuarios`, `/roles` | `ADMIN` |
+
+Send the token as `Authorization: Bearer <token>`. Documentation, Swagger,
+health/info, and `/error` stay public so the gateway Swagger UI keeps working.
+The shared implementation lives in `com.distrimarket.commons.security` and is
+enabled per service with `security.enabled: true`.
+
 ## Gateway APIs
 
 Open <http://localhost:8080/swagger-ui.html>. The combined contract includes every
@@ -98,7 +118,7 @@ Requires Python 3, Java 21, and PostgreSQL binaries (`initdb`, `pg_ctl`, `psql`)
 PATH. Run as a regular user, since `initdb` cannot run as root. It starts a new
 PostgreSQL cluster and all applications on available local ports, checks every
 controller group, gateway routing, Swagger, auth login/token validation,
-validation, and compatibility, then verifies stock changes `0 → 10 → 7 → 10`
+Compras 401/403 rules, validation, and compatibility, then verifies stock changes `0 → 10 → 7 → 10`
 through purchase, sale, and cancellation. A full stack restart must preserve stock
 and Liquibase history. Processes are stopped on exit; the temporary directory
 printed at startup retains database files and logs. Inherited database settings are
