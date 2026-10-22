@@ -1,0 +1,67 @@
+databaseChangeLog:
+  - changeSet:
+      id: 031-create-usuario-roles
+      author: distrimarket
+      comment: Un usuario puede tener varios roles (muchos a muchos); reemplaza la columna usuarios.id_rol
+      changes:
+        - createTable:
+            tableName: usuario_roles
+            columns:
+              - column:
+                  name: id_usuario
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_usuario_roles_usuario
+                    references: usuarios(id)
+              - column:
+                  name: id_rol
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_usuario_roles_rol
+                    references: roles(id)
+        - addPrimaryKey:
+            tableName: usuario_roles
+            columnNames: id_usuario, id_rol
+            constraintName: pk_usuario_roles
+        # Conserva el rol que ya tuviera cada usuario antes de quitar la columna.
+        - sql:
+            sql: INSERT INTO usuario_roles (id_usuario, id_rol) SELECT id, id_rol FROM usuarios WHERE id_rol IS NOT NULL
+        - dropForeignKeyConstraint:
+            baseTableName: usuarios
+            constraintName: fk_usuarios_rol
+        - dropColumn:
+            tableName: usuarios
+            columnName: id_rol
+      rollback:
+        - addColumn:
+            tableName: usuarios
+            columns:
+              - column:
+                  name: id_rol
+                  type: BIGINT
+        - sql:
+            sql: UPDATE usuarios u SET id_rol = (SELECT MIN(ur.id_rol) FROM usuario_roles ur WHERE ur.id_usuario = u.id)
+        - addForeignKeyConstraint:
+            baseTableName: usuarios
+            baseColumnNames: id_rol
+            constraintName: fk_usuarios_rol
+            referencedTableName: roles
+            referencedColumnNames: id
+        - dropTable:
+            tableName: usuario_roles
+
+  - changeSet:
+      id: 032-seed-roles
+      author: distrimarket
+      comment: Roles del sistema (mismos nombres que el enum RolUsuario)
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO roles (nombre, fecha_creacion) VALUES
+              ('ADMIN', NOW()), ('VENDEDOR', NOW()), ('DEPOSITERO', NOW()), ('COMPRADOR', NOW())
+              ON CONFLICT (nombre) DO NOTHING
+      rollback:
+        - sql:
+            sql: DELETE FROM roles WHERE nombre IN ('ADMIN', 'VENDEDOR', 'DEPOSITERO', 'COMPRADOR')

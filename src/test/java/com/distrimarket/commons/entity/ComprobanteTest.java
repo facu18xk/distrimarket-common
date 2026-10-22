@@ -1,5 +1,6 @@
 package com.distrimarket.commons.entity;
 
+import com.distrimarket.commons.enums.RolUsuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -108,9 +109,9 @@ class ComprobanteTest {
     @DisplayName("Verificar instancias y getters/setters de entidades de seguridad y módulos adicionales")
     void testNuevasEntidades() {
         Rol rol = Rol.builder()
-                .nombre("ROLE_ADMIN")
+                .nombre(RolUsuario.ADMIN)
                 .build();
-        assertEquals("ROLE_ADMIN", rol.getNombre());
+        assertEquals(RolUsuario.ADMIN, rol.getNombre());
 
         Persona persona = Persona.builder()
                 .nombreCompleto("Juan Perez")
@@ -120,12 +121,13 @@ class ComprobanteTest {
         Usuario usuario = Usuario.builder()
                 .username("admin")
                 .password("bcrypt_hash")
-                .rol(rol)
+                .roles(java.util.Set.of(rol))
                 .persona(persona)
                 .activo(true)
                 .build();
         assertTrue(usuario.getActivo());
         assertEquals("admin", usuario.getUsername());
+        assertTrue(usuario.getRoles().contains(rol));
 
         Configuracion config = Configuracion.builder()
                 .clave("IVA_DEFECTO")

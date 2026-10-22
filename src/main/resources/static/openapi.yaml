@@ -16,6 +16,8 @@ servers:
     description: Microservicio Ventas Local (Puerto 8082)
   - url: http://localhost:8083
     description: Microservicio Compras Local (Puerto 8083)
+  - url: http://localhost:8084
+    description: Microservicio de Seguridad Local (Puerto 8084)
 
 # =============================================================
 # 1. TAGS GLOBALES
@@ -61,9 +63,19 @@ tags:
   - name: Ventas-MediosPago
     description: Catálogo y administración de medios de pago habilitados.
 
+  # --- SEGURIDAD ---
+  - name: Auth-Sesion
+    description: Inicio de sesión y validación de tokens JWT (ruta pública solo para el login).
+  - name: Auth-Usuarios
+    description: Administración de usuarios del sistema y asignación de roles (solo ADMIN).
+
   # --- GENERAL ---
   - name: Administracion-General
     description: Parámetros globales y configuraciones del sistema.
+
+# Todas las rutas exigen un token JWT, salvo las que declaran "security: []" (el login).
+security:
+  - bearerAuth: []
 
 # =============================================================
 # 2. PATHS (RUTAS RESTful)
@@ -1866,6 +1878,198 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
 
   # ===========================================================
+  # BLOQUE 5: SEGURIDAD (distrimarket-ms-auth)
+  # ===========================================================
+  /auth/login:
+    post:
+      summary: Iniciar sesión y obtener un token JWT
+      tags: [Auth-Sesion]
+      operationId: iniciarSesion
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDTO'
+      responses:
+        '200':
+          description: Credenciales válidas; el token se envía luego como "Authorization Bearer"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+  /auth/validar:
+    get:
+      summary: Validar el token enviado y devolver sus datos
+      tags: [Auth-Sesion]
+      operationId: validarToken
+      responses:
+        '200':
+          description: Token válido y vigente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenInfoDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+  /auth/me:
+    get:
+      summary: Obtener el usuario de la sesión actual
+      tags: [Auth-Sesion]
+      operationId: obtenerUsuarioActual
+      responses:
+        '200':
+          description: Usuario dueño del token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+  /auth/roles:
+    get:
+      summary: Listar los roles que se pueden asignar
+      tags: [Auth-Usuarios]
+      operationId: listarRoles
+      responses:
+        '200':
+          description: Roles del sistema
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RolUsuario'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+
+  /auth/usuarios:
+    get:
+      summary: Listar usuarios activos con paginación
+      tags: [Auth-Usuarios]
+      operationId: listarUsuarios
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
+      responses:
+        '200':
+          description: Usuarios activos paginados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioPageResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+
+    post:
+      summary: Registrar un usuario y asignarle roles
+      description: El usuario se asocia a una persona existente o al empleado indicado (se toma su persona).
+      tags: [Auth-Usuarios]
+      operationId: crearUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCreateRequestDTO'
+      responses:
+        '201':
+          description: Usuario creado (la contraseña se guarda cifrada con BCrypt)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+
+  /auth/usuarios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      summary: Obtener usuario por ID
+      tags: [Auth-Usuarios]
+      operationId: obtenerUsuarioPorId
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+    put:
+      summary: Actualizar usuario, sus roles y opcionalmente su contraseña
+      tags: [Auth-Usuarios]
+      operationId: actualizarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioUpdateRequestDTO'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+
+    delete:
+      summary: Desactivar usuario (baja lógica)
+      tags: [Auth-Usuarios]
+      operationId: eliminarUsuario
+      responses:
+        '204':
+          description: Usuario desactivado
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+
+  # ===========================================================
   # BLOQUE 4: ADMINISTRACIÓN GENERAL
   # ===========================================================
   /configuraciones:
@@ -1887,6 +2091,13 @@ paths:
 # 3. COMPONENTS
 # =============================================================
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token emitido por POST /auth/login
+
   parameters:
     IdPath:
       name: id
@@ -2179,6 +2390,11 @@ components:
     EstadoFacturaVenta:
       type: string
       enum: [EMITIDA, ANULADA]
+
+    RolUsuario:
+      type: string
+      description: Rol del sistema; un usuario puede tener varios.
+      enum: [ADMIN, VENDEDOR, DEPOSITERO, COMPRADOR]
 
     # ---------------------------------------------------------
     # COMPRA: SCHEMAS
@@ -3413,3 +3629,187 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/FacturaVentaResponseDTO'
+    # ---------------------------------------------------------
+    # SEGURIDAD: SCHEMAS (distrimarket-ms-auth)
+    # ---------------------------------------------------------
+    LoginRequestDTO:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: "admin"
+        password:
+          type: string
+          format: password
+          minLength: 1
+          maxLength: 72
+          example: "Admin123!"
+
+    TokenResponseDTO:
+      type: object
+      required: [accessToken, tokenType, expiresIn, expiresAt, username, roles]
+      properties:
+        accessToken:
+          type: string
+          description: JWT firmado; se envía en el encabezado "Authorization Bearer"
+        tokenType:
+          type: string
+          example: "Bearer"
+        expiresIn:
+          type: integer
+          format: int64
+          description: Segundos de vigencia del token
+          example: 3600
+        expiresAt:
+          type: string
+          format: date-time
+        username:
+          type: string
+          example: "admin"
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolUsuario'
+        idPersona:
+          type: integer
+          format: int64
+        idEmpleado:
+          type: integer
+          format: int64
+          description: Presente si la persona del usuario es empleado
+
+    TokenInfoDTO:
+      type: object
+      required: [valido, username, roles, emitidoEn, expiraEn]
+      properties:
+        valido:
+          type: boolean
+          example: true
+        idUsuario:
+          type: integer
+          format: int64
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolUsuario'
+        idPersona:
+          type: integer
+          format: int64
+        idEmpleado:
+          type: integer
+          format: int64
+        emitidoEn:
+          type: string
+          format: date-time
+        expiraEn:
+          type: string
+          format: date-time
+
+    UsuarioCreateRequestDTO:
+      type: object
+      required: [username, password, roles]
+      description: Indicar idPersona o idEmpleado (uno de los dos).
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[A-Za-z0-9._-]+$'
+          example: "jperez"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          example: "Vendedor123!"
+        roles:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/RolUsuario'
+          example: [VENDEDOR]
+        idPersona:
+          type: integer
+          format: int64
+          example: 10
+        idEmpleado:
+          type: integer
+          format: int64
+          example: 1
+
+    UsuarioUpdateRequestDTO:
+      type: object
+      required: [username, roles]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[A-Za-z0-9._-]+$'
+          example: "jperez"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          description: Opcional; si se envía, reemplaza la contraseña actual
+        roles:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/RolUsuario'
+          example: [ADMIN, VENDEDOR]
+
+    UsuarioResponseDTO:
+      type: object
+      required: [idUsuario, username, roles, activo]
+      properties:
+        idUsuario:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: "jperez"
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolUsuario'
+        activo:
+          type: boolean
+          example: true
+        idPersona:
+          type: integer
+          format: int64
+        nombreCompleto:
+          type: string
+          example: "Juan Pérez"
+        documento:
+          type: string
+          description: CI o RUC de la persona
+          example: "3456789"
+        idEmpleado:
+          type: integer
+          format: int64
+          description: Presente si la persona del usuario es empleado
+        cargo:
+          type: string
+          example: "Cajero"
+
+    UsuarioPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UsuarioResponseDTO'
