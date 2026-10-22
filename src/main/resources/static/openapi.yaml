@@ -111,6 +111,65 @@ paths:
                 error: Conflict
                 message: Ya existe una factura registrada con ese número y timbrado para el proveedor indicado
                 path: /api/v1/compras/facturas
+  /compras/facturas/buscar:
+    get:
+      summary: Buscar facturas de compra con filtros combinables y paginación
+      description: 'Búsqueda paginada de facturas de compra. Todos los filtros son opcionales
+        y combinables; la paginación (page, size, sort) es obligatoria.'
+      tags:
+      - Compras-Facturas
+      operationId: buscarFacturasCompra
+      parameters:
+      - $ref: '#/components/parameters/PageQuery'
+      - $ref: '#/components/parameters/SizeQuery'
+      - $ref: '#/components/parameters/SortQuery'
+      - name: proveedorId
+        in: query
+        description: Filtra por proveedor
+        required: false
+        schema:
+          type: integer
+          format: int64
+          example: 5
+      - name: estado
+        in: query
+        description: Filtra por estado exacto (ACTIVA, ANULADA)
+        required: false
+        schema:
+          type: string
+          example: ACTIVA
+      - name: desde
+        in: query
+        description: Fecha de emisión mínima (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+          example: '2026-01-01'
+      - name: hasta
+        in: query
+        description: Fecha de emisión máxima (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+          example: '2026-12-31'
+      - name: numeroFactura
+        in: query
+        description: Coincidencia parcial con el número de factura
+        required: false
+        schema:
+          type: string
+          example: '001-001'
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturaCompraPageResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
   /compras/proveedores:
     get:
       summary: Listar proveedores comerciales
