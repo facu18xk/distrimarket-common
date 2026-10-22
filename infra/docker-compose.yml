@@ -1,0 +1,45 @@
+# Infraestructura local de Distrimarket: solo Redis.
+#
+# La base de datos es Supabase (u otro PostgreSQL hospedado); no se levanta un
+# PostgreSQL local. Configurar DB_URL o DB_* en ../.env.local.
+#
+# Uso:
+#   docker compose -f infra/docker-compose.yml up -d
+#   docker compose -f infra/docker-compose.yml --profile insight up -d   # + Redis Insight
+
+name: distrimarket
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: distrimarket-redis
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: >
+      sh -c 'if [ -n "$$REDIS_PASSWORD" ];
+             then exec redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS_PASSWORD";
+             else exec redis-server /usr/local/etc/redis/redis.conf; fi'
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ${REDIS_PASSWORD:+-a $$REDIS_PASSWORD} ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: distrimarket-redisinsight
+    profiles: ["insight"]
+    ports:
+      - "${REDIS_INSIGHT_PORT:-5540}:5540"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis-data:

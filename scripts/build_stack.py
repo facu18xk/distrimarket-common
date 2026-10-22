@@ -9,8 +9,9 @@ import subprocess
 import tempfile
 
 WORKSPACE = Path(__file__).resolve().parents[2]
-REPOS = ["distrimarket-common", "distrimarket-eureka", "distrimarket-gateway",
-         "distrimarket-ms-featureA", "distrimarket-ms-featureB", "distrimarket-ms-featureC"]
+REPOS = ["distrimarket-common", "distrimarket-gateway",
+         "distrimarket-ms-featureA", "distrimarket-ms-featureB", "distrimarket-ms-featureC",
+         "distrimarket-ms-auth"]
 
 
 def main():

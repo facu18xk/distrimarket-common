@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify discovery, gateway contracts, and purchase/sale stock effects with disposable PostgreSQL."""
+"""Verify gateway contracts, auth, and purchase/sale stock effects with disposable PostgreSQL."""
 import argparse
 import json
 import os
@@ -14,11 +14,11 @@ from urllib.request import Request, urlopen
 
 WORKSPACE = Path(__file__).resolve().parents[2]
 APPLICATIONS = {
-    "eureka": ("distrimarket-eureka", "com.distrimarket.eureka.EurekaServerApplication"),
     "gateway": ("distrimarket-gateway", "com.distrimarket.gateway.GatewayApplication"),
     "compras": ("distrimarket-ms-featureA", "com.distrimarket.compras.ComprasApplication"),
     "inventario": ("distrimarket-ms-featureB", "com.distrimarket.inventario.InventarioApplication"),
     "ventas": ("distrimarket-ms-featureC", "com.distrimarket.ms.featurec.DistrimarketMsFeatureCApplication"),
+    "auth": ("distrimarket-ms-auth", "com.distrimarket.ms.auth.DistrimarketMsAuthApplication"),
 }
 
 
@@ -96,16 +96,16 @@ class Stack:
         env = dict(os.environ)
         # Ignore inherited production connection configuration.
         for key in list(env):
-            if key.startswith(("SPRING_", "DB_", "EUREKA_", "OPENAPI_")) or key == "JAVA_TOOL_OPTIONS":
+            if key.startswith(("SPRING_", "DB_", "OPENAPI_")) or key == "JAVA_TOOL_OPTIONS":
                 del env[key]
         env.update({"SERVER_PORT": str(self.ports[name]), "PORT": str(self.ports[name]),
                     "SPRING_DATASOURCE_URL": f"jdbc:postgresql://127.0.0.1:{self.ports['postgres']}/postgres?sslmode=disable&prepareThreshold=0",
                     "DB_USER": "postgres", "DB_PASSWORD": "", "LIQUIBASE_ENABLED": "true",
-                    "EUREKA_URL": f"http://127.0.0.1:{self.ports['eureka']}/eureka/",
-                    "EUREKA_INSTANCE_IP_ADDRESS": "127.0.0.1", "EUREKA_INSTANCE_HOSTNAME": "localhost",
-                    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "true", "EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS": "1",
-                    "EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS": "1",
-                    "SPRING_CLOUD_LOADBALANCER_CACHE_ENABLED": "false", "SPRING_JPA_SHOW_SQL": "false",
+                    "CACHE_ENABLED": "false", "SPRING_JPA_SHOW_SQL": "false",
+                    "COMPRAS_URL": f"http://127.0.0.1:{self.ports['compras']}",
+                    "INVENTARIO_URL": f"http://127.0.0.1:{self.ports['inventario']}",
+                    "VENTAS_URL": f"http://127.0.0.1:{self.ports['ventas']}",
+                    "AUTH_URL": f"http://127.0.0.1:{self.ports['auth']}",
                     "LOG_LEVEL_ROOT": "WARN", "LOG_LEVEL_APP": "WARN", "LOG_LEVEL_REPOSITORY": "WARN"})
         command = ["java", "-Xms64m", "-Xmx256m", "-XX:ActiveProcessorCount=2"]
         if self.classes:
@@ -118,7 +118,7 @@ class Stack:
         self.files.append(output)
         process = subprocess.Popen(command, cwd=self.directory, env=env, stdout=output, stderr=subprocess.STDOUT)
         self.processes.append((name, process))
-        path = "/" if name == "eureka" else "/openapi.yaml" if name == "gateway" else ("" if name == "compras" else "/" + name) + "/v3/api-docs"
+        path = "/openapi.yaml" if name == "gateway" else ("" if name == "compras" else "/" + name) + "/v3/api-docs"
         def ready():
             if process.poll() is not None:
                 raise RuntimeError(name + " exited; see " + str(self.directory / (name + ".log")))
@@ -150,15 +150,6 @@ def verify(stack):
     gateway = f"http://127.0.0.1:{stack.ports['gateway']}"
     def api(path, **kwargs):
         return http(gateway + path, **kwargs)
-    registry = f"http://127.0.0.1:{stack.ports['eureka']}/eureka/apps"
-    def discovery():
-        data = http(registry)
-        apps = data["applications"].get("application", [])
-        if isinstance(apps, dict):
-            apps = [apps]
-        names = {app["name"] for app in apps}
-        require({"DISTRIMARKET-COMPRAS", "DISTRIMARKET-INVENTARIO", "DISTRIMARKET-VENTAS"} <= names, "All three services must register")
-    eventually(discovery)
     routes = {
         "inventario": ["categorias", "marcas", "productos", "depositos", "stock-depositos", "personas", "empleados", "ajustes-stock", "transferencias-stock"],
         "compras": ["facturas", "proveedores", "ordenes", "proveedores-productos"],
@@ -170,16 +161,24 @@ def verify(stack):
             require(isinstance(result, dict), service + "/" + group + " must return a page")
             expected = "contenido" if service == "compras" or group == "medios-pago" else "content"
             require(expected in result, service + "/" + group + " pagination changed")
-    print("Discovery and all controller groups passed", flush=True)
+    print("All controller groups passed", flush=True)
     spec = api("/openapi.yaml", headers={"Accept": "application/yaml"})
-    require("url: /" in spec, "Swagger must use the gateway server")
-    require("/ventas/facturas-venta:" in spec and "/compras/facturas:" in spec and "/inventario/productos:" in spec, "Shared contract must include all services")
+    require("url: http://localhost:8080" in spec, "Swagger must use the gateway server")
+    require("/ventas/facturas-venta:" in spec and "/compras/facturas:" in spec and "/inventario/productos:" in spec
+            and "/auth/login:" in spec, "Shared contract must include all services")
     http(gateway + "/swagger-ui.html", headers={"Accept": "text/html"})
     config = api("/v3/api-docs/swagger-config")
     require(config["url"] == "/openapi.yaml", "Gateway Swagger must use the shared contract")
     for service in routes:
         doc = api("/" + service + "/v3/api-docs")
         require(bool(doc.get("paths")), service + " documentation must route through the gateway")
+    auth_doc = api("/auth/v3/api-docs")
+    require(bool(auth_doc.get("paths")), "Auth documentation must route through the gateway")
+    login = api("/auth/login", method="POST", body={"username": "admin", "password": "Admin123!"})
+    require(bool(login.get("accessToken")), "Auth login must return a token")
+    me = api("/auth/me", headers={"Authorization": "Bearer " + login["accessToken"]})
+    require(me.get("username") == "admin", "Auth token must identify the bootstrap admin")
+    print("Auth login and token validation passed", flush=True)
 
     def create(path, body):
         return api(path, method="POST", body=body, expected=201)
