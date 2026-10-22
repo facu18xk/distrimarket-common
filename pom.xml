@@ -172,10 +172,13 @@
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>
                             <schemaMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
-                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</schemaMappings>
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona,
+                                RolUsuario=com.distrimarket.commons.enums.RolUsuario</schemaMappings>
                             <importMappings>TipoAjuste=com.distrimarket.commons.enums.TipoAjuste,
-                                TipoPersona=com.distrimarket.commons.enums.TipoPersona</importMappings>
+                                TipoPersona=com.distrimarket.commons.enums.TipoPersona,
+                                RolUsuario=com.distrimarket.commons.enums.RolUsuario</importMappings>
                             <configOptions>
+                                <serializableModel>true</serializableModel>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <interfaceOnly>false</interfaceOnly>
                                 <openApiNullable>false</openApiNullable>
