@@ -64,9 +64,10 @@ def require(condition, message):
 
 
 class Stack:
-    def __init__(self, directory, classes):
+    def __init__(self, directory, classes, cache=False):
         self.directory = directory
         self.classes = classes
+        self.cache = cache
         self.ports = {}
         for name in [*APPLICATIONS, "postgres"]:
             port = free_port()
@@ -101,7 +102,9 @@ class Stack:
         env.update({"SERVER_PORT": str(self.ports[name]), "PORT": str(self.ports[name]),
                     "SPRING_DATASOURCE_URL": f"jdbc:postgresql://127.0.0.1:{self.ports['postgres']}/postgres?sslmode=disable&prepareThreshold=0",
                     "DB_USER": "postgres", "DB_PASSWORD": "", "LIQUIBASE_ENABLED": "true",
-                    "CACHE_ENABLED": "false", "SPRING_JPA_SHOW_SQL": "false",
+                    "CACHE_ENABLED": "true" if self.cache else "false",
+                    "REDIS_HOST": "127.0.0.1", "REDIS_PORT": "6379",
+                    "SPRING_JPA_SHOW_SQL": "false",
                     "JWT_SECRET": "distrimarket-dev-secret-cambiar-en-produccion-2026",
                     "JWT_ISSUER": "distrimarket-auth",
                     "AUTH_BOOTSTRAP_ADMIN": "true", "AUTH_ADMIN_USERNAME": "admin",
@@ -248,10 +251,18 @@ def verify(stack):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--classes", action="store_true", help="Use classpaths produced by build_stack.py --classes")
+    parser.add_argument("--cache", action="store_true",
+                        help="Enable Redis caches; requires a Redis server on 127.0.0.1:6379")
     args = parser.parse_args()
+    if args.cache:
+        try:
+            with socket.create_connection(("127.0.0.1", 6379), timeout=2):
+                pass
+        except OSError as error:
+            raise SystemExit("Redis is not reachable on 127.0.0.1:6379: " + str(error))
     directory = Path(tempfile.mkdtemp(prefix="distrimarket-stack-"))
     print("Disposable database and logs: " + str(directory), flush=True)
-    stack = Stack(directory, args.classes)
+    stack = Stack(directory, args.classes, args.cache)
     try:
         stack.start_database()
         for name in APPLICATIONS:

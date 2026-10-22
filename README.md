@@ -93,9 +93,10 @@ Los listados no se cachean completos: se guarda cada elemento por su ID.
 docker compose -f infra/docker-compose.yml up -d   # Redis
 ```
 
-`CACHE_ENABLED=false` desactiva la caché sin afectar las lecturas (la verificación
-de integración lo usa para no depender de Redis). Si Redis no responde, Compras
-sigue funcionando contra la base y registra el fallo en el log.
+`CACHE_ENABLED=false` desactiva la caché sin afectar las lecturas. La verificación
+de integración la desactiva por defecto; con `--cache` usa un Redis que debe estar
+escuchando en `127.0.0.1:6379`. Si Redis no responde, Compras sigue funcionando
+contra la base y registra el fallo en el log.
 
 ## Gateway APIs
 
@@ -136,7 +137,8 @@ Compras 401/403 rules, validation, and compatibility, then verifies stock change
 through purchase, sale, and cancellation. A full stack restart must preserve stock
 and Liquibase history. Processes are stopped on exit; the temporary directory
 printed at startup retains database files and logs. Inherited database settings are
-replaced for this disposable run, and auth runs with `CACHE_ENABLED=false`.
+replaced for this disposable run. Caches are disabled by default; pass `--cache`
+to exercise Compras and Auth against a Redis running on `127.0.0.1:6379`.
 
 When executable JAR packaging dependencies are unavailable but application
 dependencies are cached, use compiled classes:
