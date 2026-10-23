@@ -101,7 +101,7 @@ Compras is the first service enforcing tokens:
 | --- | --- |
 | Compras | `ADMIN`, `COMPRADOR` |
 | Inventario | currently open (next step) |
-| Ventas | currently open (next step) |
+| Ventas | `ADMIN`, `VENDEDOR` |
 | Auth `/usuarios`, `/roles` | `ADMIN` |
 
 Send the token as `Authorization: Bearer <token>`. Documentation, Swagger,

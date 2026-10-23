@@ -1064,6 +1064,8 @@ paths:
         Suma o resta existencias de uno o varios productos en un depósito, de forma atómica.
         Una cantidad positiva ingresa stock y una negativa lo descuenta. Lo usan ventas y compras
         para reflejar sus facturas; los ajustes y transferencias aplican la misma regla internamente.
+        El origen debe corresponder al rol del usuario: VENTA para VENDEDOR, COMPRA para COMPRADOR
+        (ADMIN puede ambos); si no corresponde, responde 403.
       operationId: aplicarMovimientosStock
       requestBody:
         required: true
@@ -3286,6 +3288,16 @@ components:
       example: EMITIDA
       description: Estado de la factura de venta (EMITIDA o ANULADA)
 
+    OrigenMovimientoStock:
+      type: string
+      description: >-
+        Quién origina un movimiento de stock. Inventario lo valida contra el rol del token:
+        VENTA solo para VENDEDOR (o ADMIN) y COMPRA solo para COMPRADOR (o ADMIN).
+      enum:
+        - VENTA
+        - COMPRA
+      example: VENTA
+
     # ---------------------------------------------------------
     # SCHEMA - PERSONA DTO
     # (Reutilizado por Cliente, Proveedor, Empleado y Usuario)
@@ -3807,9 +3819,11 @@ components:
         estado:
           $ref: '#/components/schemas/EstadoFacturaVenta'
 
+    # Línea de una factura: solo el id del producto. El nombre lo resuelve quien muestra
+    # la factura con el catálogo de productos de inventario (sin anidar objetos).
     FacturaVentaDetalleResponseDTO:
       type: object
-      required: [idDetalle, idProducto, nombreProducto, cantidad, precioUnitario, subtotal, montoIva]
+      required: [idDetalle, idProducto, cantidad, precioUnitario, subtotal, montoIva]
       properties:
         idDetalle:
           type: integer
@@ -3819,9 +3833,6 @@ components:
           type: integer
           format: int64
           example: 101
-        nombreProducto:
-          type: string
-          example: "Leche Entera 1L"
         cantidad:
           type: integer
           example: 2
@@ -3838,38 +3849,73 @@ components:
           type: number
           example: 1090.91
 
-    FacturaVentaResponseDTO:
+    # Cabecera de una factura para los listados: plana, sin objetos anidados ni detalles.
+    # Datos propios de ventas (cliente) van con su nombre; los de otros microservicios
+    # (empleado, depósito) solo con su id.
+    FacturaVentaResumenDTO:
       allOf:
         - $ref: '#/components/schemas/BaseComprobante'
         - type: object
-          required: [idFacturaVenta, activo, estado, totalIva, totalGeneral, cliente, empleado, timbrado, detalles]
+          required: [idFacturaVenta, estado, totalGeneral, idCliente, clienteNombre]
           properties:
             idFacturaVenta:
               type: integer
               format: int64
               example: 98
+            estado:
+              $ref: '#/components/schemas/EstadoFacturaVenta'
+            totalGeneral:
+              type: number
+              example: 60000.00
+            idCliente:
+              type: integer
+              format: int64
+              example: 15
+            clienteNombre:
+              type: string
+              example: "Ana Pérez"
+            clienteDocumento:
+              type: string
+              description: CI o RUC del cliente
+              example: "4567890-1"
+            idEmpleado:
+              type: integer
+              format: int64
+              example: 1
+            idDeposito:
+              type: integer
+              format: int64
+              example: 1
+            idMedioPago:
+              type: integer
+              format: int64
+              example: 1
+
+    # Factura completa (GET por id, alta, modificación y cambio de estado): plana, con sus
+    # líneas. Los detalles solo se piden al abrir una factura, no en el listado.
+    FacturaVentaResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/FacturaVentaResumenDTO'
+        - type: object
+          required: [activo, totalIva, idTimbrado, detalles]
+          properties:
             activo:
               type: boolean
               description: Indica si el comprobante está activo; se reserva para borrado lógico.
               example: true
-            estado:
-              $ref: '#/components/schemas/EstadoFacturaVenta'
             totalIva:
               type: number
               example: 5454.55
-            totalGeneral:
-              type: number
-              example: 60000.00
-            cliente:
-              $ref: '#/components/schemas/ClienteResponseDTO'
-            empleado:
-              $ref: '#/components/schemas/EmpleadoResponseDTO'
-            deposito:
-              $ref: '#/components/schemas/DepositoResponseDTO'
-            medioPago:
-              $ref: '#/components/schemas/MedioPagoDTO'
-            timbrado:
-              $ref: '#/components/schemas/TimbradoDTO'
+            medioPagoNombre:
+              type: string
+              example: "Efectivo"
+            idTimbrado:
+              type: integer
+              format: int64
+              example: 3
+            numeroTimbrado:
+              type: string
+              example: "16543210"
             detalles:
               type: array
               items:
@@ -4434,6 +4480,7 @@ components:
               items:
                 $ref: '#/components/schemas/FacturaCompraResponseDTO'
 
+    # El listado devuelve solo cabeceras (FacturaVentaResumenDTO); el detalle se pide por id.
     FacturaVentaPageResponseDTO:
       allOf:
         - $ref: '#/components/schemas/BasePageResponse'
@@ -4443,7 +4490,7 @@ components:
             content:
               type: array
               items:
-                $ref: '#/components/schemas/FacturaVentaResponseDTO'
+                $ref: '#/components/schemas/FacturaVentaResumenDTO'
 
     FacturaVentaDetallePageResponseDTO:
       allOf:
@@ -4572,7 +4619,7 @@ components:
       enum: [ADMIN, VENDEDOR, DEPOSITERO, COMPRADOR]
     StockMovimientoRequestDTO:
       type: object
-      required: [idDeposito, motivo, detalles]
+      required: [idDeposito, origen, motivo, detalles]
       properties:
         idDeposito:
           type: integer
@@ -4580,6 +4627,8 @@ components:
           minimum: 1
           example: 1
           description: "ID del depósito donde se mueve el stock"
+        origen:
+          $ref: '#/components/schemas/OrigenMovimientoStock'
         motivo:
           type: string
           minLength: 1
