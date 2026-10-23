@@ -53,13 +53,34 @@ class ApiCompatibilityTest {
         empleado.setId(3L);
         empleado.setFechaIngreso(LocalDate.of(2026, 1, 1));
         empleado.setPersona(persona);
+
+        var result = json.readTree(json.writeValueAsString(empleado));
+        assertEquals(12L, result.at("/persona/id").asLong());
+        assertFalse(result.at("/persona").has("idPersona"));
+        assertEquals("2026-01-01", result.at("/fechaIngreso").asText());
+    }
+
+    @Test
+    void facturaDeVentaEsPlanaYSoloReferenciaOtrosMicroserviciosPorId() throws Exception {
         FacturaVentaResponseDTO factura = new FacturaVentaResponseDTO();
-        factura.setEmpleado(empleado);
+        factura.setIdFacturaVenta(98L);
+        factura.setIdCliente(15L);
+        factura.setClienteNombre("Ana Pérez");
+        factura.setIdEmpleado(3L);
+        factura.setIdDeposito(1L);
+        FacturaVentaDetalleResponseDTO linea = new FacturaVentaDetalleResponseDTO();
+        linea.setIdProducto(101L);
+        linea.setCantidad(2);
+        factura.setDetalles(List.of(linea));
 
         var result = json.readTree(json.writeValueAsString(factura));
-        assertEquals(12L, result.at("/empleado/persona/id").asLong());
-        assertFalse(result.at("/empleado/persona").has("idPersona"));
-        assertEquals("2026-01-01", result.at("/empleado/fechaIngreso").asText());
+        assertEquals(3L, result.get("idEmpleado").asLong());
+        assertEquals("Ana Pérez", result.get("clienteNombre").asText());
+        for (String anidado : List.of("cliente", "empleado", "deposito", "medioPago", "timbrado")) {
+            assertFalse(result.has(anidado), "La factura no debe anidar " + anidado);
+        }
+        assertEquals(101L, result.at("/detalles/0/idProducto").asLong());
+        assertFalse(result.at("/detalles/0").has("nombreProducto"));
     }
 
     @Test
@@ -71,7 +92,7 @@ class ApiCompatibilityTest {
         assertFalse(compras.has("content"));
 
         FacturaVentaPageResponseDTO ventas = new FacturaVentaPageResponseDTO();
-        ventas.setContent(List.of(new FacturaVentaResponseDTO()));
+        ventas.setContent(List.of(new FacturaVentaResumenDTO()));
         ventas.setPageNumber(0);
         ventas.setPageSize(10);
         var result = json.readTree(json.writeValueAsString(ventas));
