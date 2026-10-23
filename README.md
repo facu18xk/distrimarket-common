@@ -9,6 +9,7 @@ files under `target/` are discarded on the next build.
 Keep these six repositories in the same parent directory:
 `distrimarket-common`, `distrimarket-gateway`, `distrimarket-ms-featureA`,
 `distrimarket-ms-featureB`, `distrimarket-ms-featureC`, and `distrimarket-ms-auth`.
+The gateway repository contains two applications: the gateway and `eureka-server/`.
 
 ## Build
 
@@ -18,8 +19,8 @@ Use Java 21 and Maven 3.9 or later. From this repository:
 python3 scripts/build_stack.py
 ```
 
-The script installs common first, then tests and packages the five applications
-(gateway, Compras, Inventario, Ventas, Auth). Set `MAVEN=/path/to/mvn` when Maven
+The script installs common first, then tests and packages the six applications
+(gateway, Eureka, Compras, Inventario, Ventas, Auth). Set `MAVEN=/path/to/mvn` when Maven
 is not on PATH. To isolate dependencies, pass `--repository /tmp/distrimarket-m2`;
 dependencies must be available there or downloadable from Maven Central. Maven
 returns a failure if any repository fails.
@@ -48,8 +49,8 @@ touches the Supabase database.
 
 ## Cómo ejecutar
 
-No hay Eureka: el gateway usa rutas estáticas y los servicios pueden arrancar en
-cualquier orden.
+Eureka es obligatorio: `run_stack.py` lo arranca primero (8761), después los
+servicios y el gateway. El gateway resuelve con `lb://`.
 
 ```sh
 cd distrimarket-common
@@ -60,9 +61,11 @@ python3 scripts/run_stack.py
 ```
 
 `run_stack.py` requiere el build con `--classes` (genera `target/runtime-classpath.txt`).
+El build también compila `distrimarket-gateway/eureka-server/`.
 
 | Servicio | Puerto |
 | --- | --- |
+| Eureka | 8761 |
 | Gateway | 8080 |
 | Inventario | 8081 |
 | Ventas | 8082 |
@@ -80,8 +83,9 @@ Sin Redis usar `CACHE_ENABLED=false`.
 Detener:
 
 ```sh
-for d in distrimarket-ms-featureB distrimarket-ms-featureC \
-         distrimarket-ms-featureA distrimarket-ms-auth distrimarket-gateway; do
+for d in distrimarket-gateway/eureka-server distrimarket-ms-featureB \
+         distrimarket-ms-featureC distrimarket-ms-featureA distrimarket-ms-auth \
+         distrimarket-gateway; do
   [ -f "$d/target/local-run.pid" ] && kill "$(cat "$d/target/local-run.pid")" 2>/dev/null || true
 done
 docker compose -f infra/docker-compose.yml down
@@ -157,8 +161,8 @@ python3 scripts/verify_stack.py
 
 Requires Python 3, Java 21, and PostgreSQL binaries (`initdb`, `pg_ctl`, `psql`) on
 PATH. Run as a regular user, since `initdb` cannot run as root. It starts a new
-PostgreSQL cluster and all applications on available local ports, checks every
-controller group, gateway routing, Swagger, auth login/token validation,
+PostgreSQL cluster and all applications on available local ports, checks Eureka
+registration, every controller group, gateway routing, Swagger, auth login/token validation,
 Compras 401/403 rules, validation, and compatibility, then verifies stock changes `0 → 10 → 7 → 10`
 through purchase, sale, and cancellation. A full stack restart must preserve stock
 and Liquibase history. Processes are stopped on exit; the temporary directory

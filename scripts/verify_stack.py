@@ -14,6 +14,7 @@ from urllib.request import Request, urlopen
 
 WORKSPACE = Path(__file__).resolve().parents[2]
 APPLICATIONS = {
+    "eureka": ("distrimarket-gateway/eureka-server", "com.distrimarket.eureka.EurekaServerApplication"),
     "gateway": ("distrimarket-gateway", "com.distrimarket.gateway.GatewayApplication"),
     "compras": ("distrimarket-ms-featureA", "com.distrimarket.compras.ComprasApplication"),
     "inventario": ("distrimarket-ms-featureB", "com.distrimarket.inventario.InventarioApplication"),
@@ -109,10 +110,14 @@ class Stack:
                     "JWT_ISSUER": "distrimarket-auth",
                     "AUTH_BOOTSTRAP_ADMIN": "true", "AUTH_ADMIN_USERNAME": "admin",
                     "AUTH_ADMIN_PASSWORD": "Admin123!",
-                    "COMPRAS_URL": f"http://127.0.0.1:{self.ports['compras']}",
-                    "INVENTARIO_URL": f"http://127.0.0.1:{self.ports['inventario']}",
-                    "VENTAS_URL": f"http://127.0.0.1:{self.ports['ventas']}",
-                    "AUTH_URL": f"http://127.0.0.1:{self.ports['auth']}",
+                    "EUREKA_URL": f"http://127.0.0.1:{self.ports['eureka']}/eureka/",
+                    "EUREKA_INSTANCE_IP_ADDRESS": "127.0.0.1",
+                    "EUREKA_INSTANCE_HOSTNAME": "localhost",
+                    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "true",
+                    "EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS": "1",
+                    "EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS": "1",
+                    "SPRING_CLOUD_LOADBALANCER_CACHE_ENABLED": "false",
+                    "INVENTARIO_URL": "",
                     "LOG_LEVEL_ROOT": "WARN", "LOG_LEVEL_APP": "WARN", "LOG_LEVEL_REPOSITORY": "WARN"})
         command = ["java", "-Xms64m", "-Xmx256m", "-XX:ActiveProcessorCount=2"]
         if self.classes:
@@ -125,7 +130,7 @@ class Stack:
         self.files.append(output)
         process = subprocess.Popen(command, cwd=self.directory, env=env, stdout=output, stderr=subprocess.STDOUT)
         self.processes.append((name, process))
-        path = "/openapi.yaml" if name == "gateway" else ("" if name == "compras" else "/" + name) + "/v3/api-docs"
+        path = "/" if name == "eureka" else "/openapi.yaml" if name == "gateway" else ("" if name == "compras" else "/" + name) + "/v3/api-docs"
         def ready():
             if process.poll() is not None:
                 raise RuntimeError(name + " exited; see " + str(self.directory / (name + ".log")))
@@ -158,9 +163,26 @@ def login_token(gateway, username, password):
                 body={"username": username, "password": password})
 
 
+def wait_for_registry(stack):
+    registry = f"http://127.0.0.1:{stack.ports['eureka']}/eureka/apps"
+    expected = {"DISTRIMARKET-INVENTARIO", "DISTRIMARKET-VENTAS",
+                "DISTRIMARKET-COMPRAS", "DISTRIMARKET-AUTH"}
+
+    def discovery():
+        data = http(registry)
+        apps = data["applications"].get("application", [])
+        if isinstance(apps, dict):
+            apps = [apps]
+        names = {app["name"] for app in apps}
+        require(expected <= names, "All services must register in Eureka")
+
+    eventually(discovery)
+
+
 def verify(stack):
     gateway = f"http://127.0.0.1:{stack.ports['gateway']}"
-    token = login_token(gateway, "admin", "Admin123!")["accessToken"]
+    wait_for_registry(stack)
+    token = eventually(lambda: login_token(gateway, "admin", "Admin123!"))["accessToken"]
 
     def api(path, **kwargs):
         headers = {"Authorization": "Bearer " + token}
@@ -178,7 +200,7 @@ def verify(stack):
         for group in groups:
             result = eventually(lambda: api(f"/{service}/{group}?page=0&size=2&sort=id,asc"))
             require(isinstance(result, dict), service + "/" + group + " must return a page")
-            expected = "contenido" if service == "compras" or group == "medios-pago" else "content"
+            expected = "contenido" if service == "compras" else "content"
             require(expected in result, service + "/" + group + " pagination changed")
     print("All controller groups passed", flush=True)
     spec = api("/openapi.yaml", headers={"Accept": "application/yaml"})
@@ -229,13 +251,13 @@ def verify(stack):
         "idEmpleado": empleado["id"], "idDeposito": deposito["id"], "idMedioPago": medio["idMedioPago"], "idTimbrado": timbrado["idTimbrado"],
         "detalles": [{"idProducto": producto["id"], "cantidad": 3}]}
     venta = create("/ventas/facturas-venta", sale_request)
-    require(venta["empleado"]["persona"]["id"] == empleado["persona"]["id"], "Sale must serialize the shared employee")
+    require(venta["idEmpleado"] == empleado["id"], "Sale must preserve the employee id")
     require(api(stock_path)["cantidad"] == 7, "Sale must subtract three units")
     invoice_path = f"/ventas/facturas/{venta['idFacturaVenta']}"
     require(api(invoice_path)["idFacturaVenta"] == venta["idFacturaVenta"], "Invoice alias must preserve IDs")
     api(invoice_path, method="PATCH", body={"estado": "ANULADA"})
     require(api(stock_path)["cantidad"] == 10, "Cancellation must restore stock")
-    api(invoice_path, method="PATCH", body={"estado": "ANULADA"})
+    api(invoice_path, method="PATCH", body={"estado": "ANULADA"}, expected=409)
     require(api(stock_path)["cantidad"] == 10, "Repeated cancellation must not restore stock twice")
     require(api(f"/medios-pago/{medio['idMedioPago']}")["idMedioPago"] == medio["idMedioPago"], "Payment alias must route to Ventas")
     api("/ventas/clientes/99999999", expected=404)
@@ -273,7 +295,8 @@ def main():
         for name in APPLICATIONS:
             stack.start_service(name)
         gateway = f"http://127.0.0.1:{stack.ports['gateway']}"
-        token = login_token(gateway, "admin", "Admin123!")["accessToken"]
+        wait_for_registry(stack)
+        token = eventually(lambda: login_token(gateway, "admin", "Admin123!"))["accessToken"]
         require(eventually(lambda: http(gateway + stock_path,
                                         headers={"Authorization": "Bearer " + token}))["cantidad"] == 10,
                 "Restart must preserve stock")

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Start the local stack using the compiled runtime classpaths."""
 
+import json
 import os
 from pathlib import Path
 import socket
@@ -12,6 +13,7 @@ import urllib.request
 
 WORKSPACE = Path(__file__).resolve().parents[2]
 SERVICES = (
+    ("distrimarket-gateway/eureka-server", "com.distrimarket.eureka.EurekaServerApplication", 8761, "/"),
     ("distrimarket-ms-featureB", "com.distrimarket.inventario.InventarioApplication", 8081, "/inventario/v3/api-docs"),
     ("distrimarket-ms-featureC", "com.distrimarket.ms.featurec.DistrimarketMsFeatureCApplication", 8082, "/ventas/v3/api-docs"),
     ("distrimarket-ms-featureA", "com.distrimarket.compras.ComprasApplication", 8083, "/v3/api-docs"),
@@ -103,9 +105,34 @@ def main():
         else:
             raise RuntimeError(f"{name} did not become ready; see {log_path}. Started processes remain running.")
 
-    print("All services are ready.", flush=True)
-    print("Swagger: http://localhost:8080/swagger-ui.html", flush=True)
-    print("Auth Swagger: http://localhost:8084/auth/swagger-ui.html", flush=True)
+    expected = {"DISTRIMARKET-INVENTARIO", "DISTRIMARKET-VENTAS",
+                "DISTRIMARKET-COMPRAS", "DISTRIMARKET-AUTH"}
+    deadline = time.monotonic() + 90
+    while time.monotonic() < deadline:
+        try:
+            req = urllib.request.Request("http://localhost:8761/eureka/apps",
+                                         headers={"Accept": "application/json"})
+            with urllib.request.urlopen(req, timeout=3) as response:
+                apps = json.load(response)["applications"].get("application", [])
+            if isinstance(apps, dict):
+                apps = [apps]
+            up = set()
+            for app in apps:
+                instances = app.get("instance", [])
+                if isinstance(instances, dict):
+                    instances = [instances]
+                if any(instance.get("status") == "UP" for instance in instances):
+                    up.add(app["name"])
+            if expected <= up:
+                print("All services are UP in Eureka.", flush=True)
+                print("Eureka: http://localhost:8761", flush=True)
+                print("Swagger: http://localhost:8080/swagger-ui.html", flush=True)
+                print("Auth Swagger: http://localhost:8084/auth/swagger-ui.html", flush=True)
+                return
+        except (OSError, urllib.error.URLError, ValueError, KeyError):
+            pass
+        time.sleep(2)
+    raise RuntimeError("Services started, but Eureka registration is incomplete; check target/local-run.log in each repository.")
 
 
 if __name__ == "__main__":
