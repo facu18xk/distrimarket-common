@@ -46,22 +46,48 @@ file or set `CACHE_ENABLED=false`; the service falls back to the database.
 The integration verifier starts its own disposable PostgreSQL cluster; it never
 touches the Supabase database.
 
-## Running the stack
+## Cómo ejecutar
 
-Run each JAR from its repository in a separate terminal. There is no discovery
-server and no startup order requirement: the gateway uses static routes.
+No hay Eureka: el gateway usa rutas estáticas y los servicios pueden arrancar en
+cualquier orden.
 
-| Repository | Command | Default port |
-| --- | --- | --- |
-| distrimarket-ms-featureB | `java -jar target/distrimarket-inventario-1.0.0.jar` | 8081 |
-| distrimarket-ms-featureC | `java -jar target/distrimarket-ms-featureC-0.0.1-SNAPSHOT.jar` | 8082 |
-| distrimarket-ms-featureA | `java -jar target/distrimarket-compras-1.0-SNAPSHOT.jar` | 8083 |
-| distrimarket-ms-auth | `java -jar target/distrimarket-auth-0.0.1.jar` | 8084 |
-| distrimarket-gateway | `java -jar target/distrimarket-gateway-1.0.0-SNAPSHOT.jar` | 8080 |
+```sh
+cd distrimarket-common
+docker compose -f infra/docker-compose.yml up -d   # Redis (opcional)
+export MAVEN=/ruta/a/mvn                          # si mvn no está en PATH
+python3 scripts/build_stack.py --classes
+python3 scripts/run_stack.py
+```
 
-Application ports can be overridden with `SERVER_PORT`; the gateway and
-microservices also accept `PORT`. The gateway route targets can be overridden with
-`COMPRAS_URL`, `INVENTARIO_URL`, `VENTAS_URL`, and `AUTH_URL`.
+`run_stack.py` requiere el build con `--classes` (genera `target/runtime-classpath.txt`).
+
+| Servicio | Puerto |
+| --- | --- |
+| Gateway | 8080 |
+| Inventario | 8081 |
+| Ventas | 8082 |
+| Compras | 8083 |
+| Auth | 8084 |
+
+Swagger: <http://localhost:8080/swagger-ui.html> · Auth: <http://localhost:8084/auth/swagger-ui.html>
+
+Login: `POST /auth/login` con `admin` / `Admin123!`; enviar `Authorization: Bearer <token>`.
+Compras exige rol `ADMIN` o `COMPRADOR`.
+
+La base es Supabase (`.env.local`); la primera ejecución aplica la migración 005.
+Sin Redis usar `CACHE_ENABLED=false`.
+
+Detener:
+
+```sh
+for d in distrimarket-ms-featureB distrimarket-ms-featureC \
+         distrimarket-ms-featureA distrimarket-ms-auth distrimarket-gateway; do
+  [ -f "$d/target/local-run.pid" ] && kill "$(cat "$d/target/local-run.pid")" 2>/dev/null || true
+done
+docker compose -f infra/docker-compose.yml down
+```
+
+Verificar sin tocar Supabase: `python3 scripts/verify_stack.py` (`--cache` requiere Redis).
 
 ## Security
 
