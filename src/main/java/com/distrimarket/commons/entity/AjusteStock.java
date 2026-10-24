@@ -1,9 +1,12 @@
 package com.distrimarket.commons.entity;
 
 import com.distrimarket.commons.enums.TipoAjuste;
+import com.distrimarket.commons.model.SoftDeletable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class AjusteStock extends BaseEntity {
+@SQLRestriction("activo = true")
+public class AjusteStock extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito", nullable = false)

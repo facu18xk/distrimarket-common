@@ -3,6 +3,8 @@ package com.distrimarket.commons.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
+import com.distrimarket.commons.model.SoftDeletable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class TransferenciaStock extends BaseEntity {
+@SQLRestriction("activo = true")
+public class TransferenciaStock extends BaseEntity implements SoftDeletable {
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_deposito_origen", nullable = false)

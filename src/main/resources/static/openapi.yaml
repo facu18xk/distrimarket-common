@@ -1496,6 +1496,25 @@ paths:
           $ref: '#/components/responses/ConflictResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags: [Ajustes-Stock]
+      summary: Eliminar un ajuste de stock por ID
+      operationId: deleteAjusteStock
+      responses:
+        '204':
+          description: AjusteStock eliminado con éxito
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /inventario/transferencias-stock:
     get:
@@ -1571,6 +1590,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferenciaStockResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags: [Transferencias-Stock]
+      summary: Eliminar una transferencia de stock por ID
+      operationId: deleteTransferenciaStock
+      responses:
+        '204':
+          description: TransferenciaStock eliminado con éxito
         '400':
           $ref: '#/components/responses/BadRequestResponse'
         '401':

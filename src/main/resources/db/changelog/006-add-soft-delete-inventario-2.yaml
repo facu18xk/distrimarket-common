@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-activo-to-stock-deposito
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: stock_deposito
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: stock_deposito
+            columnName: activo
+
+  - changeSet:
+      id: add-activo-to-ajuste-stock
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: ajuste_stock
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: ajuste_stock
+            columnName: activo
+
+  - changeSet:
+      id: add-activo-to-transferencias-stock
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: transferencias_stock
+            columns:
+              - column:
+                  name: activo
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: transferencias_stock
+            columnName: activo
