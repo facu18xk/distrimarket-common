@@ -5,7 +5,7 @@ info:
   version: 1.0.1
   contact:
     name: "Soporte DistriMarket"
-    email: "soporte@distrimarket.com"
+    email: "soporte.distrimarket@gmail.com"
 
 servers:
   - url: http://localhost:8080
