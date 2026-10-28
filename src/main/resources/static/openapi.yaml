@@ -668,6 +668,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
         - $ref: '#/components/parameters/FilterCategoriaQuery'
         - $ref: '#/components/parameters/FilterMarcaQuery'
       responses:
@@ -802,6 +804,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
       responses:
         '200':
           description: Lista paginada de depósitos obtenida con éxito
