@@ -221,6 +221,15 @@
                 </dependencies>
             </plugin>
 
+            <!-- 6. Autoriza ByteBuddy y desactiva Class Data Sharing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                </configuration>
+            </plugin>
+
             <!-- NOTA: Se omite intencionalmente 'spring-boot-maven-plugin' para asegurar
                  que se genere un JAR estándar de librería y no un Fat JAR ejecutable (BOOT-INF). -->
         </plugins>
