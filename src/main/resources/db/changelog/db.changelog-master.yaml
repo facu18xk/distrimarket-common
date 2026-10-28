@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/005-usuarios-multiples-roles.yaml
   - include:
       file: db/changelog/006-add-soft-delete-inventario-2.yaml
+  - include:
+      file: db/changelog/007-deposito-empleado-y-notificaciones.yaml

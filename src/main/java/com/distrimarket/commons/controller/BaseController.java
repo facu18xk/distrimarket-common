@@ -42,8 +42,10 @@ public abstract class BaseController<REQ, RES, ID> {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponseDTO<RES>> listarPaginado(Pageable pageable) {
-        PageResponseDTO<RES> pagina = service.listarPaginado(pageable);
+    public ResponseEntity<PageResponseDTO<RES>> listarPaginado(
+            @org.springframework.web.bind.annotation.RequestParam(name = "q", required = false) String q,
+            Pageable pageable) {
+        PageResponseDTO<RES> pagina = service.buscarTexto(q, pageable);
         return ResponseEntity.ok(pagina);
     }
 

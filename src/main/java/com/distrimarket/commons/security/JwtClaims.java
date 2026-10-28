@@ -10,6 +10,8 @@ public final class JwtClaims {
     public static final String USER_ID = "uid";
     public static final String PERSONA_ID = "idPersona";
     public static final String EMPLEADO_ID = "idEmpleado";
+    /** Depósito asignado al empleado (si tiene): vendedor, comprador y depositero operan sobre él. */
+    public static final String DEPOSITO_ID = "idDeposito";
 
     private JwtClaims() {
     }

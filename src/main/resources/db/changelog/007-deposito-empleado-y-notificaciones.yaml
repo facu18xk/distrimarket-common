@@ -1,0 +1,203 @@
+databaseChangeLog:
+  # ---------------------------------------------------------------
+  # Depósito asignado a cada empleado: vendedor, comprador y depositero
+  # trabajan sobre su depósito sin tener que elegirlo (viaja en el token).
+  # Opcional: un empleado sin depósito (por ejemplo, un ADMIN) elige en cada operación.
+  # ---------------------------------------------------------------
+  - changeSet:
+      id: add-deposito-to-empleados
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: empleados
+            columns:
+              - column:
+                  name: id_deposito
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_empleados_deposito
+                    references: depositos(id)
+      rollback:
+        - dropColumn:
+            tableName: empleados
+            columnName: id_deposito
+
+  # ---------------------------------------------------------------
+  # Soporte: estado del envío por correo de cada mensaje de contacto
+  # (lo procesa un job programado en ventas).
+  # ---------------------------------------------------------------
+  - changeSet:
+      id: add-envio-correo-to-contacto-mensajes
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: contacto_mensajes
+            columns:
+              - column:
+                  name: correo_enviado
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_correo
+                  type: TIMESTAMP
+              - column:
+                  name: intentos_correo
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: error_correo
+                  type: VARCHAR(500)
+      rollback:
+        - dropColumn:
+            tableName: contacto_mensajes
+            columnName: error_correo
+        - dropColumn:
+            tableName: contacto_mensajes
+            columnName: intentos_correo
+        - dropColumn:
+            tableName: contacto_mensajes
+            columnName: fecha_correo
+        - dropColumn:
+            tableName: contacto_mensajes
+            columnName: correo_enviado
+
+  # ---------------------------------------------------------------
+  # Promociones: vigencia, descuento y productos de cada campaña, y registro de
+  # a qué cliente ya se le envió (el job no repite envíos y puede retomar).
+  # ---------------------------------------------------------------
+  - changeSet:
+      id: add-vigencia-to-campanias-promocion
+      author: distrimarket
+      changes:
+        - addColumn:
+            tableName: campanias_promocion
+            columns:
+              - column:
+                  name: porcentaje_descuento
+                  type: NUMERIC(5,2)
+              - column:
+                  name: fecha_inicio
+                  type: DATE
+              - column:
+                  name: fecha_fin
+                  type: DATE
+              - column:
+                  name: dias_historial
+                  type: INT
+                  defaultValueNumeric: 180
+                  constraints:
+                    nullable: false
+              - column:
+                  name: activo
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: campanias_promocion
+            columnName: activo
+        - dropColumn:
+            tableName: campanias_promocion
+            columnName: dias_historial
+        - dropColumn:
+            tableName: campanias_promocion
+            columnName: fecha_fin
+        - dropColumn:
+            tableName: campanias_promocion
+            columnName: fecha_inicio
+        - dropColumn:
+            tableName: campanias_promocion
+            columnName: porcentaje_descuento
+
+  - changeSet:
+      id: create-campania-productos
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: campania_productos
+            columns:
+              - column:
+                  name: id_campania
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_campania_productos_campania
+                    references: campanias_promocion(id)
+              - column:
+                  name: id_producto
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_campania_productos_producto
+                    references: productos(id)
+        - addPrimaryKey:
+            tableName: campania_productos
+            columnNames: id_campania, id_producto
+            constraintName: pk_campania_productos
+      rollback:
+        - dropTable:
+            tableName: campania_productos
+
+  - changeSet:
+      id: create-campania-envios
+      author: distrimarket
+      changes:
+        - createTable:
+            tableName: campania_envios
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: fecha_creacion
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fecha_modificacion
+                  type: TIMESTAMP
+              - column:
+                  name: id_campania
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_campania_envios_campania
+                    references: campanias_promocion(id)
+              - column:
+                  name: id_cliente
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_campania_envios_cliente
+                    references: clientes(id)
+              - column:
+                  name: correo
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enviado
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: error
+                  type: VARCHAR(500)
+        - addUniqueConstraint:
+            tableName: campania_envios
+            columnNames: id_campania, id_cliente
+            constraintName: uk_campania_envios_campania_cliente
+      rollback:
+        - dropTable:
+            tableName: campania_envios

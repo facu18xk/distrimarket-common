@@ -32,6 +32,22 @@ public class ContactoMensaje extends BaseEntity {
     @Builder.Default
     private Boolean atendido = false;
 
+    /** Si el job ya reenvió el mensaje al correo de soporte. */
+    @Column(name = "correo_enviado", nullable = false)
+    @Builder.Default
+    private Boolean correoEnviado = false;
+
+    @Column(name = "fecha_correo")
+    private LocalDateTime fechaCorreo;
+
+    /** Intentos de envío fallidos; pasado el máximo configurado, el job deja de reintentar. */
+    @Column(name = "intentos_correo", nullable = false)
+    @Builder.Default
+    private Integer intentosCorreo = 0;
+
+    @Column(name = "error_correo", length = 500)
+    private String errorCorreo;
+
     // Métodos de acceso semánticos para fecha_envio mapeada en BaseEntity
     public LocalDateTime getFechaEnvio() {
         return getFechaCreacion();

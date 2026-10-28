@@ -24,5 +24,8 @@ public interface BaseService<REQ, RES, ID> {
 
     PageResponseDTO<RES> buscarPaginado(Specification<?> spec, Pageable pageable);
 
+    /** Listado con búsqueda por texto libre (parámetro q); sin texto, igual que listarPaginado. */
+    PageResponseDTO<RES> buscarTexto(String q, Pageable pageable);
+
     void eliminarLogico(ID id);
 }

@@ -35,4 +35,12 @@ public class Empleado extends BaseEntity implements SoftDeletable {
     @Column(name = "estado", nullable = false)
     @Builder.Default
     private Boolean estado = true;
+
+    /**
+     * Depósito donde trabaja. Vendedor, comprador y depositero operan siempre sobre este depósito
+     * (viaja en el token como "idDeposito"); sin depósito, el empleado elige en cada operación.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_deposito")
+    private Deposito deposito;
 }

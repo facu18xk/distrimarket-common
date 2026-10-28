@@ -62,6 +62,10 @@ tags:
     description: Administración de timbrados legales de la empresa, sucursales y puntos de expedición.
   - name: Ventas-MediosPago
     description: Catálogo y administración de medios de pago habilitados.
+  - name: Ventas-Soporte
+    description: Mensajes de contacto a soporte (público); un job los reenvía por correo.
+  - name: Ventas-Promociones
+    description: Promociones por producto; un job las envía por correo a quienes compraron esos productos.
 
   # --- SEGURIDAD ---
   - name: Auth-Sesion
@@ -2670,6 +2674,182 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockDepositoResponseDTO'
 
+  # --- VENTA: soporte y promociones (correos enviados por jobs programados) ---
+  /ventas/soporte/contacto:
+    post:
+      summary: Enviar un mensaje a soporte (público, sin token)
+      description: >
+        Se puede usar desde el login, sin sesión. El mensaje se guarda y un job programado lo
+        reenvía al correo de soporte; la respuesta no espera al envío del correo.
+      tags: [Ventas-Soporte]
+      operationId: enviarMensajeSoporte
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactoMensajeRequestDTO'
+      responses:
+        '202':
+          description: Mensaje recibido; se enviará por correo en breve
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactoMensajeResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /ventas/soporte/mensajes:
+    get:
+      summary: Listar mensajes de soporte (ADMIN)
+      tags: [Ventas-Soporte]
+      operationId: listarMensajesSoporte
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - name: atendido
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Mensajes paginados (los más nuevos primero)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactoMensajePageResponseDTO'
+
+  /ventas/soporte/mensajes/{id}/atendido:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      summary: Marcar un mensaje de soporte como atendido (ADMIN)
+      tags: [Ventas-Soporte]
+      operationId: marcarMensajeAtendido
+      responses:
+        '200':
+          description: Mensaje actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactoMensajeResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /ventas/promociones:
+    get:
+      summary: Listar promociones
+      tags: [Ventas-Promociones]
+      operationId: listarPromociones
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
+      responses:
+        '200':
+          description: Promociones activas paginadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionPageResponseDTO'
+    post:
+      summary: Crear una promoción (ADMIN)
+      tags: [Ventas-Promociones]
+      operationId: crearPromocion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromocionRequestDTO'
+      responses:
+        '201':
+          description: Promoción creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionResponseDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+  /ventas/promociones/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      summary: Obtener una promoción
+      tags: [Ventas-Promociones]
+      operationId: obtenerPromocion
+      responses:
+        '200':
+          description: Promoción
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionResponseDTO'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+    put:
+      summary: Modificar una promoción que todavía no se envió (ADMIN)
+      tags: [Ventas-Promociones]
+      operationId: actualizarPromocion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromocionRequestDTO'
+      responses:
+        '200':
+          description: Promoción actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionResponseDTO'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+    delete:
+      summary: Dar de baja una promoción (ADMIN)
+      tags: [Ventas-Promociones]
+      operationId: eliminarPromocion
+      responses:
+        '204':
+          description: Promoción dada de baja
+
+  /ventas/promociones/{id}/destinatarios:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      summary: Cuántos clientes recibirían la promoción (vista previa)
+      tags: [Ventas-Promociones]
+      operationId: destinatariosPromocion
+      responses:
+        '200':
+          description: Cantidad de clientes con correo que compraron los productos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionDestinatariosDTO'
+
+  /ventas/promociones/{id}/enviar:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      summary: Programar el envío inmediato de una promoción (ADMIN)
+      description: El job programado la envía en su próxima ejecución.
+      tags: [Ventas-Promociones]
+      operationId: enviarPromocion
+      responses:
+        '202':
+          description: Envío programado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromocionResponseDTO'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3322,6 +3502,10 @@ components:
           default: true
         persona:
           $ref: '#/components/schemas/PersonaRequestDTO'
+        idDeposito:
+          type: integer
+          format: int64
+          description: Depósito donde trabaja (opcional)
 
     EmpleadoResponseDTO:
       type: object
@@ -3343,6 +3527,12 @@ components:
           example: true
         persona:
           $ref: '#/components/schemas/PersonaResponseDTO'
+        idDeposito:
+          type: integer
+          format: int64
+        nombreDeposito:
+          type: string
+          example: "Depósito Central"
 
     # ---------------------------------------------------------
     # SCHEMA - COMPROBANTE Y COMPROBANTE DETALLE
@@ -4000,9 +4190,17 @@ components:
         nombre:
           type: string
           example: "Leche Entera 1L"
+        descripcion:
+          type: string
+        precioCosto:
+          type: number
+          example: 4500.00
         precioVenta:
           type: number
           example: 6000.00
+        stockMinimo:
+          type: integer
+          example: 5
         stockActual:
           type: integer
           default: 0
@@ -4602,6 +4800,10 @@ components:
           type: integer
           format: int64
           description: Presente si la persona del usuario es empleado
+        idDeposito:
+          type: integer
+          format: int64
+          description: Depósito asignado al empleado (si tiene)
 
     TokenInfoDTO:
       type: object
@@ -4623,6 +4825,9 @@ components:
           type: integer
           format: int64
         idEmpleado:
+          type: integer
+          format: int64
+        idDeposito:
           type: integer
           format: int64
         emitidoEn:
@@ -4723,6 +4928,13 @@ components:
         cargo:
           type: string
           example: "Cajero"
+        idDeposito:
+          type: integer
+          format: int64
+          description: Depósito asignado al empleado (si tiene)
+        nombreDeposito:
+          type: string
+          example: "Depósito Central"
 
     UsuarioPageResponseDTO:
       allOf:
@@ -4734,3 +4946,170 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UsuarioResponseDTO'
+
+    # ---------------------------------------------------------
+    # SCHEMA - SOPORTE (mensajes de contacto)
+    # ---------------------------------------------------------
+    ContactoMensajeRequestDTO:
+      type: object
+      required: [nombre, correo, asunto, mensaje]
+      properties:
+        nombre:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "Juan Pérez"
+        correo:
+          type: string
+          format: email
+          maxLength: 100
+          example: "juan@correo.com"
+        asunto:
+          type: string
+          minLength: 3
+          maxLength: 150
+          example: "No puedo iniciar sesión"
+        mensaje:
+          type: string
+          minLength: 5
+          maxLength: 4000
+          example: "Desde ayer el sistema me dice que mi sesión expiró."
+
+    ContactoMensajeResponseDTO:
+      type: object
+      required: [id, nombre, correo, asunto, mensaje, fechaEnvio, atendido, correoEnviado]
+      properties:
+        id:
+          type: integer
+          format: int64
+        nombre:
+          type: string
+        correo:
+          type: string
+        asunto:
+          type: string
+        mensaje:
+          type: string
+        fechaEnvio:
+          type: string
+          format: date-time
+        atendido:
+          type: boolean
+        correoEnviado:
+          type: boolean
+          description: Si el job ya lo reenvió al correo de soporte
+        errorCorreo:
+          type: string
+
+    ContactoMensajePageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactoMensajeResponseDTO'
+
+    # ---------------------------------------------------------
+    # SCHEMA - PROMOCIONES
+    # ---------------------------------------------------------
+    PromocionRequestDTO:
+      type: object
+      required: [titulo, mensaje, idsProducto]
+      properties:
+        titulo:
+          type: string
+          minLength: 3
+          maxLength: 120
+          example: "Semana del café: 15% de descuento"
+        mensaje:
+          type: string
+          minLength: 5
+          maxLength: 4000
+          description: Texto del correo; se envía a cada cliente con su nombre al inicio.
+        porcentajeDescuento:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 15
+        fechaInicio:
+          type: string
+          format: date
+        fechaFin:
+          type: string
+          format: date
+        diasHistorial:
+          type: integer
+          minimum: 1
+          maximum: 730
+          default: 180
+          description: Se envía a quienes compraron alguno de los productos en estos últimos días.
+        fechaEnvio:
+          type: string
+          format: date-time
+          description: Cuándo enviarla; vacío = queda pendiente hasta "enviar".
+        idsProducto:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: integer
+            format: int64
+
+    PromocionResponseDTO:
+      type: object
+      required: [id, titulo, mensaje, idsProducto, diasHistorial, enviado, activo]
+      properties:
+        id:
+          type: integer
+          format: int64
+        titulo:
+          type: string
+        mensaje:
+          type: string
+        porcentajeDescuento:
+          type: number
+        fechaInicio:
+          type: string
+          format: date
+        fechaFin:
+          type: string
+          format: date
+        diasHistorial:
+          type: integer
+        fechaEnvio:
+          type: string
+          format: date-time
+        enviado:
+          type: boolean
+        activo:
+          type: boolean
+        idsProducto:
+          type: array
+          items:
+            type: integer
+            format: int64
+        correosEnviados:
+          type: integer
+          description: Clientes a los que ya se les envió
+
+    PromocionPageResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/BasePageResponse'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/PromocionResponseDTO'
+
+    PromocionDestinatariosDTO:
+      type: object
+      required: [clientes]
+      properties:
+        clientes:
+          type: integer
+          description: Clientes con correo que compraron alguno de los productos en el período

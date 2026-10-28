@@ -6,6 +6,14 @@ import com.distrimarket.commons.mapper.GenericMapper;
 import com.distrimarket.commons.model.SoftDeletable;
 import com.distrimarket.commons.repository.BaseRepository;
 import com.distrimarket.commons.service.BaseService;
+import com.distrimarket.commons.service.Paginas;
+import com.distrimarket.commons.service.CacheEnLote;
+import com.distrimarket.commons.service.ConsultaIds;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.core.GenericTypeResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +38,23 @@ public abstract class BaseServiceImpl<E, ID, REQ, RES> implements BaseService<RE
 
     protected final BaseRepository<E, ID> repository;
     protected final GenericMapper<E, REQ, RES> mapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    private CacheManager cacheManager;
+
+    @Autowired(required = false)
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    /**
+     * Dominio de caché de los objetos de este servicio (por ejemplo "proveedor"); null = sin caché.
+     * Con dominio, los listados se arman desde la caché objeto por objeto (ver paginaDe).
+     */
+    protected String dominioCache() {
+        return null;
+    }
 
     @Override
     public RES crear(REQ dto) {
@@ -61,12 +86,34 @@ public abstract class BaseServiceImpl<E, ID, REQ, RES> implements BaseService<RE
         return mapper.toDto(entity);
     }
 
+    /** Campos donde busca el parámetro q (pueden ser de relaciones: "persona.nombreCompleto"). */
+    protected String[] camposDeBusqueda() {
+        return new String[0];
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDTO<RES> buscarTexto(String q, Pageable pageable) {
+        String[] campos = camposDeBusqueda();
+        if (q == null || q.isBlank() || campos.length == 0) {
+            return listarPaginado(pageable);
+        }
+        return buscarPaginado(com.distrimarket.commons.service.BusquedaTexto.<E>en(q, campos), pageable);
+    }
+
+    /** Excluye los registros dados de baja (entidades con borrado lógico). */
+    protected Specification<E> soloActivos() {
+        return (root, query, builder) -> SoftDeletable.class.isAssignableFrom(root.getJavaType())
+                ? builder.isTrue(root.get("activo"))
+                : null;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public PageResponseDTO<RES> listarPaginado(Pageable pageable) {
         log.debug("Listando entidades paginadas. Página: {}, Tamaño: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<E> pagina = repository.findAll(pageable);
-        return PageResponseDTO.from(pagina.map(mapper::toDto));
+        // Solo activos (borrado lógico) y con desempate por id para que las páginas no se repitan.
+        return paginaDe(soloActivos(), pageable);
     }
 
     @Override
@@ -74,8 +121,35 @@ public abstract class BaseServiceImpl<E, ID, REQ, RES> implements BaseService<RE
     @SuppressWarnings("unchecked")
     public PageResponseDTO<RES> buscarPaginado(Specification<?> spec, Pageable pageable) {
         log.debug("Buscando entidades con especificación paginada. Página: {}, Tamaño: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<E> pagina = repository.findAll((Specification<E>) spec, pageable);
-        return PageResponseDTO.from(pagina.map(mapper::toDto));
+        Specification<E> filtro = spec == null ? soloActivos() : soloActivos().and((Specification<E>) spec);
+        return paginaDe(filtro, pageable);
+    }
+
+    /**
+     * Una página del listado. Con dominio de caché: de la base solo los ids (filtro y orden), cada
+     * objeto desde Redis por id (GET) y los que faltan de la base en una consulta (SET). Sin dominio:
+     * la consulta completa de siempre.
+     */
+    private PageResponseDTO<RES> paginaDe(Specification<E> filtro, Pageable pageable) {
+        String dominio = dominioCache();
+        if (dominio == null || cacheManager == null) {
+            Page<E> pagina = repository.findAll(filtro, Paginas.conDesempatePorId(pageable));
+            return PageResponseDTO.from(pagina.map(mapper::toDto));
+        }
+        Class<E> tipo = tipoEntidad();
+        Page<Long> ids = ConsultaIds.pagina(entityManager, tipo, filtro, pageable);
+        return PageResponseDTO.from(CacheEnLote.pagina(ids, cacheManager.getCache(dominio),
+                faltan -> repository.findAll(ConsultaIds.<E>idEn(faltan), Pageable.unpaged()).map(mapper::toDto).getContent(),
+                dto -> ConsultaIds.idDe(dto, tipo)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<E> tipoEntidad() {
+        Class<?>[] tipos = GenericTypeResolver.resolveTypeArguments(getClass(), BaseServiceImpl.class);
+        if (tipos == null || tipos[0] == null) {
+            throw new IllegalStateException("No se pudo determinar la entidad de " + getClass().getSimpleName());
+        }
+        return (Class<E>) tipos[0];
     }
 
     @Override
