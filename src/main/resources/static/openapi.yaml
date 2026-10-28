@@ -938,6 +938,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
         - $ref: '#/components/parameters/FilterDepositoQuery'
         - $ref: '#/components/parameters/FilterProductoQuery'
       responses:
