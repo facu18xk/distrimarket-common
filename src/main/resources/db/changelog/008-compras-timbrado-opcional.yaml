@@ -1,0 +1,13 @@
+databaseChangeLog:
+  # ---------------------------------------------------------------
+  # El formulario de compras ya no pide el timbrado del proveedor
+  # (corrección de la cátedra): la columna pasa a ser opcional.
+  # ---------------------------------------------------------------
+  - changeSet:
+      id: facturas-compras-timbrado-opcional
+      author: distrimarket
+      changes:
+        - dropNotNullConstraint:
+            tableName: facturas_compras
+            columnName: timbrado
+            columnDataType: VARCHAR(20)

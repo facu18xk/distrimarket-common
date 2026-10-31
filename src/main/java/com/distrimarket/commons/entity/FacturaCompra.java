@@ -29,7 +29,8 @@ public class FacturaCompra extends Comprobante {
     @JoinColumn(name = "id_orden_compra")
     private OrdenCompra ordenCompra;
 
-    @Column(nullable = false, length = 20)
+    /** Opcional: el formulario de compras ya no lo pide (ver changelog 008). */
+    @Column(length = 20)
     private String timbrado;
 
     @Column(nullable = false, length = 20)

@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/006-add-soft-delete-inventario-2.yaml
   - include:
       file: db/changelog/007-deposito-empleado-y-notificaciones.yaml
+  - include:
+      file: db/changelog/008-compras-timbrado-opcional.yaml
