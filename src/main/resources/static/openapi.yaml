@@ -1295,6 +1295,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageQuery'
         - $ref: '#/components/parameters/SizeQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/QueryText'
         - $ref: '#/components/parameters/FilterCargoQuery'
         - $ref: '#/components/parameters/FilterEstadoQuery'
       responses:
