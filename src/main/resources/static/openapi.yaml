@@ -4352,12 +4352,16 @@ components:
 
     AjusteStockResponseDTO:
       type: object
-      required: [id, idDeposito, nombreDeposito, idEmpleado, nombreEmpleado, motivo, tipoAjuste, detalles]
+      required: [id, fechaCreacion, idDeposito, nombreDeposito, idEmpleado, nombreEmpleado, motivo, tipoAjuste, detalles]
       properties:
         id:
           type: integer
           format: int64
           example: 1
+        fechaCreacion:
+          type: string
+          format: date
+          example: "2026-11-16"
         idDeposito:
           type: integer
           format: int64
@@ -4449,12 +4453,16 @@ components:
 
     TransferenciaStockResponseDTO:
       type: object
-      required: [id, idDepositoOrigen, nombreDepositoOrigen, idDepositoDestino, nombreDepositoDestino, idEmpleado, nombreEmpleado, estado, detalles]
+      required: [id, fechaCreacion, nombreDepositoOrigen, idDepositoDestino, nombreDepositoDestino, idEmpleado, nombreEmpleado, estado, detalles]
       properties:
         id:
           type: integer
           format: int64
           example: 100
+        fechaCreacion:
+          type: string
+          format: date
+          example: "2026-11-16"
         idDepositoOrigen:
           type: integer
           format: int64
